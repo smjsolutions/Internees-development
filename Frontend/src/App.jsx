@@ -1,9 +1,16 @@
-import React from 'react'
+import React from 'react';
+import AboutSection from "./components/aboutSection";
+import ServicesSection from "./components/servicesSection";
+import AppointmentSection from "./components/appointmentSection";
 
-const App = () => {
+function App() {
   return (
-    <div>App</div>
-  )
+    <div className="min-h-screen">
+      <AboutSection />
+      <ServicesSection />
+      <AppointmentSection />
+    </div>
+  );
 }
 
-export default App
+export default App;
