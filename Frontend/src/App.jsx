@@ -1,8 +1,20 @@
 import React from 'react'
+import './App.css'
 
-const App = () => {
+import Navbar from './components/Navbar'
+import Hero from './components/Hero'
+import Footer from './components/Footer'
+
+function App() {
+ 
+
   return (
-    <div>App</div>
+    <>
+
+<Navbar/>
+<Hero/>
+<Footer/>
+    </>
   )
 }
 
