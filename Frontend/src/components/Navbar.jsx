@@ -3,8 +3,10 @@ import { useState, useEffect } from "react";
 import { IoIosLogIn } from "react-icons/io";
 import { HiOutlineMenu, HiOutlineX } from "react-icons/hi";
 import logo from "../assets/images/logo.png";
+import { useNavigate } from "react-router-dom";
 
 const Navbar = () => {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
 
   // Disable body scroll when menu open
@@ -39,7 +41,8 @@ const Navbar = () => {
             {/* LOGIN ICON (Double Border) */}
             <div className="relative w-10 h-10 sm:w-12 sm:h-12 cursor-pointer">
               <div className="absolute inset-0 border-2 border-[#BB8C4B] rounded-md" />
-              <div className="absolute inset-1 border border-[#BB8C4B] rounded-md flex items-center justify-center bg-[#c89b5f] hover:bg-black transition text-white">
+              <div className="absolute inset-1 border border-[#BB8C4B] rounded-md flex items-center justify-center bg-[#c89b5f] hover:bg-black transition text-white"
+                 onClick={() => navigate("/login")}>
                 <IoIosLogIn className="text-xl sm:text-2xl" />
               </div>
             </div>

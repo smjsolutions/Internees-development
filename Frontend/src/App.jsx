@@ -1,15 +1,14 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import LoginPage from "./auth/LoginPage";
 import RegisterPage from "./auth/RegisterPage";
+import Home from "./pages/Home";
 
 export default function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Navigate to="/login" />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-      </Routes>
-    </Router>
+    <Routes>
+       <Route path="/" element={<Home />} /> 
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
+    </Routes>
   );
 }
