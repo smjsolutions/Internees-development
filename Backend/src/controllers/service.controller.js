@@ -1,5 +1,6 @@
 import Service from "../models/Service.model.js";
 
+/* CREATE SERVICES */
 export const createService = async (req, res) => {
   try {
     const { name, category, description, duration, pricing } = req.body;
@@ -11,10 +12,7 @@ export const createService = async (req, res) => {
       });
     }
 
-    // Pricing comes as JSON string from form-data
     const parsedPricing = pricing ? JSON.parse(pricing) : [];
-
-    // Save image paths
     const images = req.files?.map(file => file.path) || [];
 
     const service = await Service.create({
@@ -36,6 +34,26 @@ export const createService = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Failed to create service",
+      error: error.message,
+    });
+  }
+};
+
+
+/* GET ALL SERVICES */
+export const getAllServices = async (req, res) => {
+  try {
+    const services = await Service.find().sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      count: services.length,
+      data: services,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch services",
       error: error.message,
     });
   }
