@@ -4,10 +4,10 @@ require("dotenv").config();
 const testConnection = async () => {
   try {
     console.log("🔄 Connecting to MongoDB...");
-    console.log("Connection String:", process.env.MONGODB_URI);
+    console.log("Connection String:", process.env.MONGO_URI);
 
     // Remove deprecated options
-    await mongoose.connect(process.env.MONGODB_URI);
+    await mongoose.connect(process.env.MONGO_URI);
 
     console.log("\n✅ MongoDB Connected Successfully!");
     console.log("📊 Database:", mongoose.connection.db.databaseName);
