@@ -7,11 +7,13 @@ import ServicesSection from "../components/ServicesSection";
 import AppointmentSection from "../components/AppointmentSection";
 
 import Hero from '../components/Hero'
+import Footer from '../components/Footer';
+import Navbar from '../components/Navbar';
 
 const Home = () => {
   return (
     <div>
-     
+     <Navbar/>
       <Hero/>
 
       <ClientReviews />
@@ -20,6 +22,7 @@ const Home = () => {
       <AboutSection />
       <ServicesSection />
       <AppointmentSection />
+      <Footer/>
      
     </div>
   )

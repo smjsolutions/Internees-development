@@ -1,76 +1,40 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import BookingDrawer from "./BookingDrawer";
-import about1 from "../assets/images/about1.webp";
+import axios from "axios";
+import { FaArrowRight } from "react-icons/fa";
 
 const ServiceDetails = () => {
-  const { slug } = useParams();
+  const { id } = useParams();
+  const [service, setService] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
 
-  const services = [
-    {
-      title: "Simple Haircut Men",
-      slug: "simple-haircut-men",
-      image: about1,
-      description: "Basic haircut for men. Perfect for a fresh look with minimal styling.",
-      duration: "30 min",
-      price: 800,
-      pricing: [{ title: "Standard", price: 800 }],
-    },
-    {
-      title: "Fade Haircut",
-      slug: "fade-haircut",
-      image: "/images/fade-haircut.jpg",
-      description: "Stylish fade haircut that blends perfectly and gives a modern appearance.",
-      duration: "45 min",
-      price: 1200,
-      pricing: [
-        { title: "Standard", price: 1200 },
-        { title: "Premium", price: 1500 },
-      ],
-    },
-    {
-      title: "Long Cut",
-      slug: "long-cut",
-      image: "/images/long-cut.jpg",
-      description: "Haircut for long hair with layered style and precision trimming.",
-      duration: "60 min",
-      price: 1500,
-      pricing: [
-        { title: "Standard", price: 1500 },
-        { title: "Premium", price: 1800 },
-      ],
-    },
-    {
-      title: "Beard Shave",
-      slug: "beard-shave",
-      image: "/images/beard-shave.jpg",
-      description: "Smooth beard shave for a clean and sharp look.",
-      duration: "20 min",
-      price: 500,
-      pricing: [{ title: "Standard", price: 500 }],
-    },
-    {
-      title: "Beard Trim",
-      slug: "beard-trim",
-      image: "/images/beard-trim.jpg",
-      description: "Neat beard trimming with precise edges and styling.",
-      duration: "25 min",
-      price: 700,
-      pricing: [{ title: "Standard", price: 700 }],
-    },
-    {
-      title: "Shave",
-      slug: "shave",
-      image: "/images/shave.jpg",
-      description: "Clean shave for a smooth and refreshing look.",
-      duration: "15 min",
-      price: 400,
-      pricing: [{ title: "Standard", price: 400 }],
-    },
-  ];
+  useEffect(() => {
+    const fetchService = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5000/services/${id}`);
+        const data = response.data;
+        if (data.success || data._id) {
+          setService(data.data || data);
+        } else {
+          console.error("Service not found");
+        }
+      } catch (error) {
+        console.error("Error fetching service:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchService();
+  }, [id]);
 
-  const service = services.find((s) => s.slug === slug);
+  if (loading)
+    return (
+      <p className="text-center mt-10 text-gray-500 text-lg animate-pulse">
+        Loading service details...
+      </p>
+    );
 
   if (!service)
     return (
@@ -80,67 +44,81 @@ const ServiceDetails = () => {
     );
 
   return (
-    <div className="max-w-5xl mx-auto py-10 px-4">
-
-      {/* -------- PARALLEL LAYOUT START -------- */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-14 items-center">
+    <div className="max-w-6xl mx-auto py-8 px-4 sm:px-6 md:py-12 md:px-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
 
         {/* IMAGE SECTION */}
-        <div className="w-full flex items-center justify-center md:pr-6">
-          <img
-            src={service.image}
-            alt={service.title}
-            className="w-full h-auto rounded-xl object-contain"
-          />
+        <div className="w-full flex items-center justify-center">
+          {service.images && service.images.length > 0 ? (
+            <img
+              src={`http://localhost:5000/${service.images[0].replace(/\\/g, "/")}`}
+              alt={service.name || service.title}
+              className="w-full max-w-md sm:max-w-lg md:max-w-full h-auto rounded-2xl object-cover transform transition duration-500 hover:scale-105"
+            />
+          ) : (
+            <div className="text-8xl text-[#BB8C4B] animate-bounce">💈</div>
+          )}
         </div>
 
         {/* TEXT SECTION */}
-        <div className="space-y-6 md:pl-6">
-
-          <h1 className="text-3xl font-bold text-gray-900">
-            {service.title}
+        <div className="flex flex-col  justify-center space-y-4 sm:space-y-6 ">
+          {/* Title */}
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900">
+            {service.name || service.title}
           </h1>
 
-          <p className="text-gray-700 leading-relaxed">
+          {/* Description */}
+          <p className="text-gray-700 leading-relaxed text-base sm:text-lg md:text-lg">
             {service.description}
           </p>
 
-          {/* INFO BOXES */}
-          <div className="grid grid-cols-2 gap-6">
-
-            <div className="bg-gray-50 p-4 rounded-lg text-center shadow-sm border">
-              <p className="text-xs text-gray-500 uppercase tracking-wide">Duration</p>
-              <p className="text-lg font-semibold mt-1 text-gray-900">{service.duration}</p>
+          {/* Parallel Info */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:gap-6 md:gap-10 mt-4 sm:mt-6">
+            {/* Duration */}
+            <div className="flex items-center gap-2">
+              <span className="font-semibold text-gray-800">Duration:</span>
+              <span className="text-gray-600">{service.duration}</span>
             </div>
 
-            <div className="bg-gray-50 p-4 rounded-lg text-center shadow-sm border">
-              <p className="text-xs text-gray-500 uppercase tracking-wide">Price</p>
-              <p className="text-lg font-semibold mt-1 text-gray-900">₹{service.price}</p>
+            {/* Price */}
+            <div className="flex items-center gap-2 mt-2 sm:mt-0">
+              <span className="font-semibold text-gray-800">Price:</span>
+              <span className="text-gray-600">
+                ₹{service.pricing && service.pricing.length > 0
+                  ? Number(service.pricing[0]).toLocaleString("en-IN")
+                  : 0}
+              </span>
             </div>
-
           </div>
 
-          {/* BOOK BUTTON */}
+          {/* Book Now Button */}
           <button
-            onClick={() => setIsOpen(true)}
-            className="bg-[#C89B4E] hover:bg-[#b88b40] text-white px-10 py-3 rounded-lg font-semibold shadow-md transition-all"
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsOpen(true);
+            }}
+            className="group relative px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base tracking-widest text-black border border-[#D79A4A] transition-all duration-300 hover:bg-[#BB8C4B] hover:text-white flex items-center justify-center gap-2 mt-4"
           >
-            Book Appointment
+            Book Now <FaArrowRight className="inline-block text-sm sm:text-base" />
+
+            {/* Animated corner borders */}
+            <span className="absolute -top-2 -left-2 w-6 h-2 border-t border-l border-[#D79A4A] group-hover:w-8 transition-all duration-300" />
+            <span className="absolute -top-2 -right-2 w-6 h-2 border-t border-r border-[#D79A4A] group-hover:w-8 transition-all duration-300" />
+            <span className="absolute -bottom-2 -left-2 w-6 h-2 border-b border-l border-[#D79A4A] group-hover:w-8 transition-all duration-300" />
+            <span className="absolute -bottom-2 -right-2 w-6 h-2 border-b border-r border-[#D79A4A] group-hover:w-8 transition-all duration-300" />
           </button>
-
         </div>
-
       </div>
-      {/* -------- PARALLEL LAYOUT END -------- */}
 
       {/* Booking Drawer */}
-      <BookingDrawer
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
-        service={service.title}
-        price={service.price}
-      />
-
+      {service && (
+        <BookingDrawer
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+          service={service.name || service.title}
+          price={service.pricing && service.pricing.length > 0 ? service.pricing[0] : 0}
+        />
+      )}
     </div>
   );
 };

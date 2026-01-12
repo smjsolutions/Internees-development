@@ -1,16 +1,5 @@
 import mongoose from "mongoose";
 
-const pricingSchema = new mongoose.Schema({
-  title: {
-    type: String,
-    required: true,
-  },
-  price: {
-    type: Number,
-    required: true,
-  },
-});
-
 const serviceSchema = new mongoose.Schema(
   {
     name: {
@@ -29,7 +18,12 @@ const serviceSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    pricing: [pricingSchema],
+    pricing: [
+      {
+        type: Number, 
+        required: true,
+      },
+    ],
     images: [String],
   },
   { timestamps: true }
