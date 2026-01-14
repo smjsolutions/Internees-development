@@ -16,7 +16,7 @@ export default function App() {
     <div className="flex flex-col min-h-screen">
       
       {/* Routes / Page Content */}
-      <main className="flex-grow">
+      <main className="grow">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<LoginPage />} />
