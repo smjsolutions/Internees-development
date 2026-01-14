@@ -1,4 +1,6 @@
 const User = require("../models/User");
+const crypto = require("crypto");
+
 const {
   generateAccessToken,
   generateRefreshToken,
@@ -145,6 +147,78 @@ exports.getCurrentUser = async (req, res, next) => {
         avatar: user.avatar,
         lastLogin: user.lastLogin,
       },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Forgot password
+// @route   POST /api/auth/forgot-password
+// @access  Public
+exports.forgotPassword = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "No user found with this email" });
+    }
+
+    // Generate reset token
+    const resetToken = crypto.randomBytes(32).toString("hex");
+
+    user.resetPasswordToken = crypto
+      .createHash("sha256")
+      .update(resetToken)
+      .digest("hex");
+
+    user.resetPasswordExpire = Date.now() + 10 * 60 * 1000; // 10 minutes
+
+    await user.save({ validateBeforeSave: false });
+
+    // For now, just return the token (in production, send via email)
+    const resetUrl = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
+
+    res.json({
+      success: true,
+      message: "Password reset link sent to your email",
+      resetUrl, // Remove this in production
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Reset password
+// @route   POST /api/auth/reset-password/:token
+// @access  Public
+exports.resetPassword = async (req, res, next) => {
+  try {
+    const { password } = req.body;
+    const { token } = req.params;
+
+    const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+
+    const user = await User.findOne({
+      resetPasswordToken: hashedToken,
+      resetPasswordExpire: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res
+        .status(400)
+        .json({ message: "Invalid or expired reset token" });
+    }
+
+    user.password = password;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+    await user.save();
+
+    res.json({
+      success: true,
+      message: "Password reset successful",
     });
   } catch (error) {
     next(error);

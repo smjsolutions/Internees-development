@@ -1,9 +1,12 @@
+const dotenv = require("dotenv");
+dotenv.config();
+
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
-require("dotenv").config();
 
+const passport = require("./config/passport");
 const connectDB = require("./config/db");
 
 // 🔹 IMPORT ROUTES
@@ -21,6 +24,7 @@ app.use(helmet());
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(passport.initialize());
 
 // CORS
 app.use(
@@ -41,7 +45,6 @@ app.use(
   express.static("uploads")
 );
 
-
 // Health check
 app.get("/api/health", (req, res) => {
   res.json({
@@ -51,7 +54,7 @@ app.get("/api/health", (req, res) => {
 });
 
 // 🔹 REGISTER ROUTES (THIS WAS MISSING)
-app.use("/api/services", serviceRoutes);               // ✅ ADMIN
+app.use("/api/services", serviceRoutes); // ✅ ADMIN
 app.use("/api/customer/services", customerServicesRoutes); // ✅ CUSTOMER
 
 app.use("/api/auth", authRoutes);

@@ -45,6 +45,9 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    // Add these fields to the schema
+    resetPasswordToken: String,
+    resetPasswordExpire: Date,
     googleId: String,
     facebookId: String,
     avatar: String,
