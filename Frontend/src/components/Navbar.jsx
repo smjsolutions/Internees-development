@@ -25,7 +25,7 @@ const Navbar = () => {
   return (
     <nav className="w-full border-b border-gray-200 bg-[#222227] z-50 fixed top-0 left-0">
       {/* MAIN CONTAINER */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
+      <div className="max-w-7xl mx-auto container px-4 sm:px-6 lg:px-12">
         <div className="py-3 sm:py-4 flex items-center justify-between">
           
           {/* LOGO */}

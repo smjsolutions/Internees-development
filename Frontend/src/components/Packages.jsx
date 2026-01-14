@@ -3,7 +3,7 @@ import React from "react";
 const Packages = () => {
   return (
     <section className="bg-[#faf7f2] mt-10 py-16">
-      <div className="max-w-7xl mx-auto container px-4">
+      <div className="max-w-7xl mx-auto container  px-4 sm:px-6 lg:px-12 ">
         <div className="grid md:grid-cols-2 gap-12">
           {/* GOLD PACKAGE */}
           <div>

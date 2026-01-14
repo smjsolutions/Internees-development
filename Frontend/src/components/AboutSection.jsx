@@ -8,8 +8,8 @@ import about3 from "../assets/images/about3.webp";
 
 export default function AboutSection() {
   return (
-    <section className="bg-[#faf8f5] py-20 px-5 md:px-[7%] relative">
-      <div className="grid lg:grid-cols-2 gap-10 items-start max-w-7xl mx-auto">
+    <section className="bg-[#faf8f5] py-20  mt-10 relative">
+      <div className="grid lg:grid-cols-2 gap-10 items-start max-w-7xl mx-auto container px-4 sm:px-6 lg:px-12">
 
         {/* LEFT SIDE (Images + Call Box) */}
         <div className="order-2 lg:order-1 relative w-full flex flex-col items-center lg:items-start">
