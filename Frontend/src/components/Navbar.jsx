@@ -1,5 +1,4 @@
-import React from "react";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { IoIosLogIn } from "react-icons/io";
 import { HiOutlineMenu, HiOutlineX } from "react-icons/hi";
 import logo from "../assets/images/logo.png";
@@ -9,17 +8,26 @@ const Navbar = () => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
 
-  // Disable body scroll when menu open
+  // Disable body scroll when mobile menu is open
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "auto";
   }, [isOpen]);
 
-  return (
-    <nav className="w-full border-b border-gray-200 bg-[#222227] relative z-50">
-      {/* MAIN CONTAINER */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-16">
-        <div className="py-3 sm:py-4 flex items-center justify-between">
+  const menuItems = [
+    "Home",
+    "Who we are",
+    "Deals/Packages",
+    "Services We Offer",
+    "Gallery",
+    "Contact",
+  ];
 
+  return (
+    <nav className="w-full border-b border-gray-200 bg-[#222227] z-50 fixed top-0 left-0">
+      {/* MAIN CONTAINER */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
+        <div className="py-3 sm:py-4 flex items-center justify-between">
+          
           {/* LOGO */}
           <img
             src={logo}
@@ -27,10 +35,13 @@ const Navbar = () => {
             className="h-8 sm:h-10 md:h-12 w-auto object-contain"
           />
 
-          {/* DESKTOP MENU */}
-          <ul className="hidden md:flex items-center gap-3 lg:gap-6 xl:gap-10 uppercase text-[12px] lg:text-[14px] font-serif text-[#DDDDDD]">
-            {["Home","Who we are","Deals/Packages","Services We Offer","Gallery","Contact"].map(item => (
-              <li key={item} className="hover:text-[#BB8C4B] cursor-pointer transition">
+          {/* DESKTOP MENU (ONLY LG+) */}
+          <ul className="hidden lg:flex flex-1 justify-center items-center gap-4 xl:gap-6 uppercase text-[14px] lg:text-[15px] font-serif text-[#DDDDDD]">
+            {menuItems.map((item) => (
+              <li
+                key={item}
+                className="hover:text-[#BB8C4B] cursor-pointer transition"
+              >
                 {item}
               </li>
             ))}
@@ -38,18 +49,20 @@ const Navbar = () => {
 
           {/* RIGHT SECTION */}
           <div className="flex items-center gap-3">
-            {/* LOGIN ICON (Double Border) */}
+            {/* LOGIN ICON */}
             <div className="relative w-10 h-10 sm:w-12 sm:h-12 cursor-pointer">
               <div className="absolute inset-0 border-2 border-[#BB8C4B] rounded-md" />
-              <div className="absolute inset-1 border border-[#BB8C4B] rounded-md flex items-center justify-center bg-[#c89b5f] hover:bg-black transition text-white"
-                 onClick={() => navigate("/login")}>
+              <div
+                className="absolute inset-1 border border-[#BB8C4B] rounded-md flex items-center justify-center bg-[#c89b5f] hover:bg-black transition text-white"
+                onClick={() => navigate("/login")}
+              >
                 <IoIosLogIn className="text-xl sm:text-2xl" />
               </div>
             </div>
 
-            {/* HAMBURGER */}
+            {/* HAMBURGER (SHOWS BELOW LG, INCLUDING MD) */}
             <button
-              className="md:hidden text-[#DDDDDD]"
+              className="lg:hidden text-[#DDDDDD]"
               onClick={() => setIsOpen(!isOpen)}
             >
               {isOpen ? (
@@ -65,19 +78,21 @@ const Navbar = () => {
       {/* BACKDROP */}
       <div
         onClick={() => setIsOpen(false)}
-        className={`fixed inset-0 bg-black/50 transition-opacity duration-300 md:hidden ${
+        className={`fixed inset-0 bg-black/50 transition-opacity duration-300 lg:hidden ${
           isOpen ? "opacity-100 visible" : "opacity-0 invisible"
         }`}
       />
 
       {/* MOBILE MENU */}
       <div
-        className={`md:hidden absolute left-0 w-full bg-[#222227] transform transition-all duration-300 ease-in-out ${
-          isOpen ? "translate-y-0 opacity-100" : "-translate-y-10 opacity-0 pointer-events-none"
+        className={`lg:hidden absolute left-0 w-full bg-[#222227] transform transition-all duration-300 ease-in-out ${
+          isOpen
+            ? "translate-y-0 opacity-100 pointer-events-auto"
+            : "-translate-y-10 opacity-0 pointer-events-none"
         }`}
       >
         <ul className="flex flex-col items-center gap-4 py-6 uppercase text-[14px] font-serif text-[#DDDDDD]">
-          {["Home","Who we are","Deals/Packages","Services We Offer","Gallery","Contact"].map(item => (
+          {menuItems.map((item) => (
             <li
               key={item}
               onClick={() => setIsOpen(false)}

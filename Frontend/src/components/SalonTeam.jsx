@@ -30,7 +30,7 @@ const teamMembers = [
 
 export default function TeamSection() {
   return (
-    <section className="bg-white py-20">
+    <section className="bg-white container max-w-7xl mx-auto py-20">
       {/* Heading */}
       <h3 className="bg-[#BB8C4B] text-white text-center py-2 px-8 rounded-md mx-auto w-fit mb-4">
         Diamond Trim

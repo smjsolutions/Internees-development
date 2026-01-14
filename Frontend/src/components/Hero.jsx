@@ -31,7 +31,7 @@ const Hero = () => {
 
   return (
     <section
-      className="relative w-full overflow-hidden"
+      className="relative w-full  overflow-hidden pt-[90px]"
       style={{
         backgroundImage: `url(${bgImg})`,
         backgroundSize: "cover",

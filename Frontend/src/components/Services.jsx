@@ -40,7 +40,7 @@ const Services = () => {
   if (loading) return <p className="text-center mt-10">Loading services...</p>;
 
   return (
-    <section className="bg-gray-100 py-24 px-4 sm:px-6 lg:px-20">
+    <section className="bg-gray-100 py-24 mt-10 px-4 sm:px-6 lg:px-20">
       <div className="max-w-7xl mx-auto">
         {/* Heading */}
         <div className="text-center mb-20">
@@ -64,7 +64,7 @@ const Services = () => {
                   <img
                     src={`http://localhost:5000/${service.images[0].replace(/\\/g, "/")}`}
                     alt={service.name}
-                    className="w-20 h-20 object-cover mx-auto rounded-full"
+                    className="w-52 h-35 object-cover mx-auto rounded-lg"
                   />
                 ) : (
                   <div className="text-4xl text-[#BB8C4B]">💈</div>
