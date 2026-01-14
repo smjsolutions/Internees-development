@@ -35,8 +35,8 @@ const ServicesSection = () => {
   if (loading) return <p className="text-center mt-10">Loading services...</p>;
 
   return (
-    <section className="bg-white py-24 px-4 sm:px-6 lg:px-20">
-      <div className="max-w-7xl mx-auto container" >
+    <section className="bg-white py-24 mt-10 ">
+      <div className="max-w-7xl mx-auto container px-4 sm:px-6 lg:px-12" >
         {/* Heading */}
         <div className="text-center mb-20">
           <p className="text-[#BB8C4B] tracking-widest uppercase mb-3 text-sm sm:text-base">
