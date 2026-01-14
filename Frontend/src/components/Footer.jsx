@@ -4,7 +4,7 @@ import logo from "../assets/images/logo.png";
 
 const Footer = () => {
   return (
-    <footer className="bg-[#222227] text-[#DDDDDD] pt-10 pb-6 mt-auto ">
+    <footer className="bg-[#222227] text-[#DDDDDD] pt-10 pb-6 "> 
       <div className="max-w-7xl container mx-auto px-6 md:px-16 grid md:grid-cols-3 gap-10">
 
         {/* Left Section: Logo + About + Social Icons */}
