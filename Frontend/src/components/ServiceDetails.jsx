@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import BookingDrawer from "./BookingDrawer";
 import axios from "axios";
@@ -9,6 +9,9 @@ const ServiceDetails = () => {
   const [service, setService] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
+  const [showFullDescription, setShowFullDescription] = useState(false);
+  const [showReadMore, setShowReadMore] = useState(false);
+  const descRef = useRef(null);
 
   useEffect(() => {
     const fetchService = async () => {
@@ -16,7 +19,6 @@ const ServiceDetails = () => {
         const response = await axios.get(
           `${import.meta.env.VITE_API_BASE_URL}/api/customer/services/${id}`
         );
-
         const data = response.data;
         if (data.success && data.data) {
           setService(data.data);
@@ -33,6 +35,17 @@ const ServiceDetails = () => {
     fetchService();
   }, [id]);
 
+  // Check if description exceeds 3 lines
+  useEffect(() => {
+    if (descRef.current) {
+      const lineHeight = parseInt(getComputedStyle(descRef.current).lineHeight, 10);
+      const maxHeight = lineHeight * 3;
+      if (descRef.current.scrollHeight > maxHeight) {
+        setShowReadMore(true);
+      }
+    }
+  }, [service]);
+
   if (loading)
     return (
       <p className="text-center mt-10 text-gray-500 text-lg animate-pulse">
@@ -48,33 +61,63 @@ const ServiceDetails = () => {
     );
 
   return (
-    <div className="max-w-6xl mx-auto py-8 px-4 sm:px-6 md:py-12 md:px-8">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
+    <div className="max-w-7xl container mx-auto pt-[100px] mt-10 mb-10 py-12 px-4 sm:px-6 md:px-8">
+
+      <div className="flex flex-col md:flex-row items-center md:items-start gap-10 md:gap-12">
 
         {/* IMAGE SECTION */}
-        <div className="w-full flex items-center justify-center">
-          {service.images && service.images.length > 0 ? (
-            <img
-              src={`${import.meta.env.VITE_API_BASE_URL}/${service.images[0].replace(/\\/g, "/")}`}
-              alt={service.name}
-              className="w-full max-w-md sm:max-w-lg md:max-w-full h-auto rounded-2xl object-cover transform transition duration-500 hover:scale-105"
-            />
-          ) : (
-            <div className="text-8xl text-[#BB8C4B] animate-bounce">💈</div>
-          )}
+        <div className="w-full md:w-1/2 flex justify-center">
+          <div className="w-full h-[250px] sm:h-[380px] md:h-auto overflow-hidden rounded-2xl">
+            {service.images && service.images.length > 0 ? (
+              <img
+                src={`${import.meta.env.VITE_API_BASE_URL}/${service.images[0].replace(/\\/g, "/")}`}
+                alt={service.name}
+                className="w-full md:h-[470px] md:object-contain  object-cover rounded-2xl"
+              />
+            ) : (
+              <div className="text-8xl text-[#BB8C4B] animate-bounce w-full h-full flex items-center justify-center">
+                💈
+              </div>
+            )}
+          </div>
         </div>
 
         {/* TEXT SECTION */}
-        <div className="flex flex-col justify-center space-y-4 sm:space-y-6">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900">
+        <div className="w-full md:w-1/2 flex flex-col items-center md:items-start text-center md:text-left space-y-4 sm:space-y-6">
+          
+          <h1 className="text-3xl sm:text-4xl md:text-5xl  font-extrabold text-gray-900">
             {service.name}
           </h1>
 
-          <p className="text-gray-700 leading-relaxed text-base sm:text-lg md:text-lg">
-            {service.description}
-          </p>
+          {service.category && (
+            <span className="mt-2 inline-block bg-[#BB8C4B] text-white text-sm sm:text-base font-medium px-3 py-1 rounded-full uppercase tracking-wide">
+              {service.category}
+            </span>
+          )}
 
-          <div className="flex flex-col sm:flex-row sm:items-center sm:gap-6 md:gap-10 mt-4 sm:mt-6">
+          {/* DESCRIPTION WITH READ MORE */}
+          <div className="mt-4 text-gray-700 text-base sm:text-lg md:text-lg leading-relaxed">
+            <p
+              ref={descRef}
+              className={`transition-all duration-300 ${
+                !showFullDescription ? "line-clamp-3 overflow-hidden" : ""
+              }`}
+            >
+              {service.description}
+            </p>
+
+            {showReadMore && (
+              <button
+                onClick={() => setShowFullDescription(!showFullDescription)}
+                className="mt-2 text-[#BB8C4B] font-semibold hover:underline"
+              >
+                {showFullDescription ? "Read Less" : "Read More"}
+              </button>
+            )}
+          </div>
+
+          {/* DURATION & PRICE */}
+          <div className="flex flex-col items-center sm:flex-row sm:items-center gap-6 mt-4 sm:mt-6 justify-center md:justify-start w-full">
             <div className="flex items-center gap-2">
               <span className="font-semibold text-gray-800">Duration:</span>
               <span className="text-gray-600">{service.duration}</span>
@@ -90,12 +133,13 @@ const ServiceDetails = () => {
             </div>
           </div>
 
+          {/* BOOK NOW BUTTON */}
           <button
             onClick={(e) => {
               e.stopPropagation();
               setIsOpen(true);
             }}
-            className="group relative px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base tracking-widest text-black border border-[#D79A4A] transition-all duration-300 hover:bg-[#BB8C4B] hover:text-white flex items-center justify-center gap-2 mt-4"
+            className="group relative px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base tracking-widest text-black border border-[#D79A4A] transition-all duration-300 hover:bg-[#BB8C4B] hover:text-white flex items-center justify-center gap-2 mt-6"
           >
             Book Now <FaArrowRight className="inline-block text-sm sm:text-base" />
             <span className="absolute -top-2 -left-2 w-6 h-2 border-t border-l border-[#D79A4A] group-hover:w-8 transition-all duration-300" />
@@ -103,6 +147,7 @@ const ServiceDetails = () => {
             <span className="absolute -bottom-2 -left-2 w-6 h-2 border-b border-l border-[#D79A4A] group-hover:w-8 transition-all duration-300" />
             <span className="absolute -bottom-2 -right-2 w-6 h-2 border-b border-r border-[#D79A4A] group-hover:w-8 transition-all duration-300" />
           </button>
+
         </div>
       </div>
 

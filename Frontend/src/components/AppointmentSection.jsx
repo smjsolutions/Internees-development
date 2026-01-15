@@ -8,7 +8,7 @@ export default function AppointmentSection() {
   const [selectedDate, setSelectedDate] = useState(""); // Track date selection
 
   return (
-    <section className="relative">
+    <section className="relative mt-10 mb-15">
       <div className="grid grid-cols-1 lg:grid-cols-3 min-h-[600px]">
 
         {/* LEFT IMAGE — hidden on small screens */}
