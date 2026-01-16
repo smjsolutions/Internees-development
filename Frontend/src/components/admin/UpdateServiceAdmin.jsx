@@ -13,7 +13,7 @@ export default function UpdateServiceAdmin() {
     category: "",
     description: "",
     duration: "",
-    pricing: 0,
+    pricing: "", // changed to string like Create
     images: [],
   });
 
@@ -35,7 +35,7 @@ export default function UpdateServiceAdmin() {
           category: found.category,
           description: found.description,
           duration: found.duration,
-          pricing: found.pricing[0],
+          pricing: found.pricing || "", // string now
           images: found.images || [],
         });
       } catch (err) {
@@ -52,7 +52,7 @@ export default function UpdateServiceAdmin() {
   };
 
   const handlePricingChange = (value) => {
-    setService({ ...service, pricing: Number(value) });
+    setService({ ...service, pricing: value }); // string like Create
   };
 
   const handleImageChange = (e) => {
@@ -70,7 +70,10 @@ export default function UpdateServiceAdmin() {
       formData.append("category", service.category);
       formData.append("description", service.description);
       formData.append("duration", service.duration);
-      formData.append("pricing", JSON.stringify([service.pricing]));
+
+      // Send pricing as string, not array
+      formData.append("pricing", service.pricing);
+
       newImages.forEach((img) => formData.append("images", img));
 
       await axios.put(`${API_BASE_URL}/api/services/${id}`, formData, {
@@ -138,7 +141,7 @@ export default function UpdateServiceAdmin() {
               />
             </div>
 
-            {/* Duration and Pricing (responsive flex) */}
+            {/* Duration and Pricing */}
             <div className="flex flex-col sm:flex-row sm:gap-6">
               <div className="flex-1">
                 <label className="block mb-1 font-medium">Duration</label>
@@ -147,8 +150,8 @@ export default function UpdateServiceAdmin() {
                   name="duration"
                   value={service.duration}
                   onChange={handleChange}
-                  className="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-amber-400"
                   placeholder="e.g., 2 hours"
+                  className="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-amber-400"
                   required
                 />
               </div>
@@ -156,9 +159,10 @@ export default function UpdateServiceAdmin() {
               <div className="flex-1 mt-4 sm:mt-0">
                 <label className="block mb-1 font-medium">Price</label>
                 <input
-                  type="number"
+                  type="text" // changed to string
                   value={service.pricing}
                   onChange={(e) => handlePricingChange(e.target.value)}
+                  placeholder="e.g., $50 or ₹5000"
                   className="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-amber-400"
                   required
                 />

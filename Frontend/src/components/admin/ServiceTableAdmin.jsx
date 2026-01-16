@@ -1,170 +1,233 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import { FiEye, FiEdit, FiTrash2, FiPlus } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-import { FiEye, FiEdit, FiTrash2 } from "react-icons/fi";
+import { useState } from "react";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-const AllServices = () => {
-  const [services, setServices] = useState([]);
-  const [error, setError] = useState("");
-  const [showModal, setShowModal] = useState(false);
-  const [serviceToDelete, setServiceToDelete] = useState(null);
+export default function ServicesTableAdmin({ services }) {
   const navigate = useNavigate();
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteServiceId, setDeleteServiceId] = useState(null);
+  const [deleteServiceName, setDeleteServiceName] = useState("");
 
-  const fetchServices = async () => {
-    try {
-      const { data } = await axios.get(`${API_BASE_URL}/api/services`);
-      if (data.success) setServices(data.data);
-      else setError("Failed to fetch services");
-    } catch (err) {
-      setError("Error fetching services");
-    }
+  const openDeleteModal = (id, name) => {
+    setDeleteServiceId(id);
+    setDeleteServiceName(name);
+    setShowDeleteModal(true);
   };
 
-  useEffect(() => {
-    fetchServices();
-  }, []);
-
-  const confirmDelete = (id) => {
-    setServiceToDelete(id);
-    setShowModal(true);
+  const closeDeleteModal = () => {
+    setShowDeleteModal(false);
+    setDeleteServiceId(null);
+    setDeleteServiceName("");
   };
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`${API_BASE_URL}/api/services/${serviceToDelete}`);
-      setShowModal(false);
-      setServiceToDelete(null);
-      fetchServices();
+      await fetch(`${API_BASE_URL}/api/services/${deleteServiceId}`, {
+        method: "DELETE",
+      });
+
+      // close modal
+      closeDeleteModal();
+
+      // refresh page (or update state in parent for smoother UX)
+      window.location.reload();
     } catch (err) {
-      alert(err.response?.data?.message || "Error deleting service");
+      console.error("Failed to delete service:", err);
+      alert("Failed to delete service.");
     }
   };
 
-  const handleUpdate = (id) => navigate(`/update-service/${id}`);
-  const handleView = (id) => navigate(`/service-details/${id}`);
-
   return (
-    <div className="p-4 sm:p-6 md:p-8 bg-gray-50 min-h-screen">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
-        <h2 className="text-2xl sm:text-3xl font-semibold text-gray-800">All Services</h2>
+    <div className="w-full space-y-4 relative">
+      {/* ================= CREATE NEW SERVICE BUTTON ================= */}
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-lg font-semibold">Services</h2>
         <button
           onClick={() => navigate("/create-service")}
-          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition w-full sm:w-auto text-center"
+          className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
         >
-          + Create New Service
+          <FiPlus size={16} />
+          Create New Service
         </button>
       </div>
 
-      {error && <p className="text-red-600 text-center mb-4">{error}</p>}
+      {/* ================= DESKTOP / TABLE ================= */}
+      <div className="hidden md:block overflow-x-auto">
+        <div className="bg-white rounded-lg shadow overflow-hidden">
+          {/* TABLE HEADER */}
+          <div
+            className="
+              grid
+              grid-cols-[60px_minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,2.2fr)_80px_80px_90px]
+              bg-gray-100 text-gray-700 font-semibold
+              text-xs lg:text-sm
+              px-3 py-3
+              gap-3
+            "
+          >
+            <span>Image</span>
+            <span>Name</span>
+            <span>Category</span>
+            <span>Description</span>
+            <span>Duration</span>
+            <span>Price</span>
+            <span className="text-center">Actions</span>
+          </div>
 
-      {/* Table container */}
-      <div className="overflow-x-auto">
-        <table className="w-full border border-gray-200 bg-white rounded-lg min-w-[700px] sm:min-w-full">
-          <thead>
-            <tr className="bg-gray-100 text-gray-700">
-              <th className="py-2 px-3 text-left">Image</th>
-              <th className="py-2 px-3 text-left">Name</th>
-              <th className="py-2 px-3 text-left">Category</th>
-              <th className="py-2 px-3 text-left">Description</th>
-              <th className="py-2 px-3 text-left">Duration</th>
-              <th className="py-2 px-3 text-left">Pricing</th>
-              <th className="py-2 px-3 text-center">Actions</th>
-            </tr>
-          </thead>
+          {/* TABLE ROWS */}
+          {services.map((service) => (
+            <div
+              key={service._id}
+              className="
+                grid
+                grid-cols-[60px_minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,2.2fr)_80px_80px_90px]
+                px-3 py-4
+                gap-3
+                items-start
+                border-t
+                text-xs lg:text-sm
+                hover:bg-gray-50
+              "
+            >
+              {/* Image */}
+              <div>
+                {service.images?.length ? (
+                  <img
+                    src={`${API_BASE_URL.replace("/api", "")}/${service.images[0]}`}
+                    alt={service.name}
+                    className="w-10 h-10 rounded object-cover"
+                  />
+                ) : (
+                  <div className="w-10 h-10 bg-gray-200 rounded" />
+                )}
+              </div>
 
-          <tbody>
-            {services.length > 0 ? (
-              services.map((service, index) => (
-                <tr
-                  key={service._id}
-                  className={`border-t ${index % 2 === 0 ? "bg-white" : "bg-gray-50"}`}
+              {/* Name */}
+              <div className="font-medium break-normal leading-snug">
+                {service.name}
+              </div>
+
+              {/* Category */}
+              <div className="break-normal leading-snug">
+                {service.category}
+              </div>
+
+              <div className="text-gray-600 leading-snug line-clamp-2">
+                {service.description}
+              </div>
+
+              {/* Duration */}
+              <div className="whitespace-nowrap text-xs lg:text-sm">
+                {service.duration}
+              </div>
+
+              {/* Price */}
+              <div className="whitespace-nowrap text-xs lg:text-sm">
+                {service.pricing || "N/A"}
+              </div>
+
+              {/* Actions */}
+              <div className="flex justify-center gap-2">
+                <button
+                  onClick={() => navigate(`/service-details/${service._id}`)}
+                  className="p-1.5 rounded-full hover:bg-amber-100 text-amber-600"
                 >
-                  {/* Image */}
-                  <td className="py-2 px-3">
-                    {service.images && service.images.length > 0 ? (
-                      <img
-                        src={`${API_BASE_URL.replace("/api", "")}/${service.images[0]}`}
-                        alt={service.name}
-                        className="w-12 h-12 sm:w-14 sm:h-14 object-cover rounded-md mx-auto"
-                      />
-                    ) : (
-                      <span className="text-gray-400 text-sm block text-center">No Image</span>
-                    )}
-                  </td>
+                  <FiEye size={14} />
+                </button>
 
-                  {/* Name, Category, Description, Duration */}
-                  <td className="py-2 px-3 font-medium text-gray-800">{service.name}</td>
-                  <td className="py-2 px-3">{service.category}</td>
-                  <td className="py-2 px-3">{service.description}</td>
-                  <td className="py-2 px-3">{service.duration}</td>
-                  <td className="py-2 px-3">
-                    {service.pricing?.length > 0
-                      ? service.pricing.map((p, i) => <div key={i}>${p}</div>)
-                      : "N/A"}
-                  </td>
+                <button
+                  onClick={() => navigate(`/update-service/${service._id}`)}
+                  className="p-1.5 rounded-full hover:bg-blue-100 text-blue-600"
+                >
+                  <FiEdit size={14} />
+                </button>
 
-                  {/* Actions */}
-                  <td className="py-2 px-3 text-center flex justify-center gap-2 flex-wrap">
-                    <button
-                      onClick={() => handleView(service._id)}
-                      className="p-2 rounded-full hover:bg-amber-100 text-amber-600 hover:text-amber-800 transition"
-                      title="View Details"
-                    >
-                      <FiEye size={18} />
-                    </button>
-
-                    <button
-                      onClick={() => handleUpdate(service._id)}
-                      className="p-2 rounded-full hover:bg-blue-100 text-blue-600 hover:text-blue-800 transition"
-                      title="Edit Service"
-                    >
-                      <FiEdit size={18} />
-                    </button>
-
-                    <button
-                      onClick={() => confirmDelete(service._id)}
-                      className="p-2 rounded-full hover:bg-red-100 text-red-600 hover:text-red-800 transition"
-                      title="Delete Service"
-                    >
-                      <FiTrash2 size={18} />
-                    </button>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="7" className="text-center py-6 text-gray-500 italic">
-                  No services found
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+                <button
+                  onClick={() => openDeleteModal(service._id, service.name)}
+                  className="p-1.5 rounded-full hover:bg-red-100 text-red-600"
+                >
+                  <FiTrash2 size={14} />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
-      {/* Delete Confirmation Modal */}
-      {showModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50 p-4">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-xs sm:max-w-sm">
-            <h3 className="text-lg font-semibold text-gray-800 mb-3 text-center">
-              Confirm Deletion
-            </h3>
-            <p className="text-gray-600 text-center mb-5">
-              Are you sure you want to delete this service?
+      {/* ================= MOBILE / CARD ================= */}
+      <div className="md:hidden space-y-4 overflow-x-auto">
+        {services.map((service) => (
+          <div
+            key={service._id}
+            className="bg-white rounded-lg shadow p-4 space-y-3"
+          >
+            <div className="flex gap-3">
+              {service.images?.length ? (
+                <img
+                  src={`${API_BASE_URL.replace("/api", "")}/${service.images[0]}`}
+                  className="w-14 h-14 rounded object-cover"
+                />
+              ) : (
+                <div className="w-14 h-14 bg-gray-200 rounded" />
+              )}
+
+              <div>
+                <h3 className="font-semibold">{service.name}</h3>
+                <p className="text-sm text-gray-500">{service.category}</p>
+              </div>
+            </div>
+
+            <p className="text-sm text-gray-600 leading-snug line-clamp-3">
+              {service.description}
             </p>
-            <div className="flex justify-center space-x-3 flex-wrap">
+
+            <div className="flex justify-between text-sm">
+              <span>
+                <b>Duration:</b> {service.duration}
+              </span>
+              <span>
+                <b>Price:</b> {service.pricing || "N/A"}
+              </span>
+            </div>
+
+            <div className="flex justify-end gap-3 pt-2">
+              <FiEye
+                onClick={() => navigate(`/service-details/${service._id}`)}
+                className="cursor-pointer text-amber-600"
+              />
+              <FiEdit
+                onClick={() => navigate(`/update-service/${service._id}`)}
+                className="cursor-pointer text-blue-600"
+              />
+              <FiTrash2
+                onClick={() => openDeleteModal(service._id, service.name)}
+                className="cursor-pointer text-red-600"
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* ================= DELETE CONFIRMATION MODAL ================= */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-80 sm:w-96 shadow-lg">
+            <h3 className="text-lg font-semibold mb-4">Confirm Deletion</h3>
+            <p className="mb-6">
+              Are you sure you want to delete <b>{deleteServiceName}</b>?
+            </p>
+            <div className="flex justify-end gap-3">
               <button
-                onClick={() => setShowModal(false)}
-                className="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400 w-full sm:w-auto"
+                onClick={closeDeleteModal}
+                className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
               >
                 Cancel
               </button>
               <button
                 onClick={handleDelete}
-                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 w-full sm:w-auto"
+                className="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700"
               >
                 Delete
               </button>
@@ -174,6 +237,4 @@ const AllServices = () => {
       )}
     </div>
   );
-};
-
-export default AllServices;
+}
