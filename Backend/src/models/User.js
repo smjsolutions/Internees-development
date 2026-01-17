@@ -55,25 +55,22 @@ const userSchema = new mongoose.Schema(
       },
     ],
     lastLogin: Date,
+    // ✅ ADD THESE FIELDS FOR PASSWORD RESET
+    resetPasswordToken: String,
+    resetPasswordExpire: Date,
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 // Hash password before saving
-// userSchema.pre("save", async function (next) {
-//   if (!this.isModified("password")) return next();
-
-//   const salt = await bcrypt.genSalt(12);
-//   this.password = await bcrypt.hash(this.password, salt);
-//   next();
-// });
 userSchema.pre("save", async function () {
   if (!this.isModified("password")) return;
 
   this.password = await bcrypt.hash(this.password, 10);
 });
+
 // Compare password method
 userSchema.methods.comparePassword = async function (candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
