@@ -12,19 +12,20 @@ const customerServicesRoutes = require("./routes/customerservices");
 const authRoutes = require("./routes/authRoutes"); // path to your auth routes file
 const galleryRoutes = require("./routes/adminGalleryRoutes");
 const CustomerGalleryRoutes=require("./routes/customerGalleryRoutes")
+const packageRoutes = require("./routes/packageRoutes");
 
 const app = express();
 
-// Connect DB
+// 🔹 Connect DB
 connectDB();
 
-// Middleware
+// 🔹 Middleware
 app.use(helmet());
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// CORS
+// 🔹 CORS
 app.use(
   cors({
     origin: process.env.CLIENT_URL || "http://localhost:5173",
@@ -32,7 +33,7 @@ app.use(
   })
 );
 
-// Static uploads
+// 🔹 Static uploads (images)
 app.use(
   "/uploads",
   (req, res, next) => {
@@ -43,25 +44,34 @@ app.use(
   express.static("uploads")
 );
 
-
-// Health check
+// 🔹 Health check
 app.get("/api/health", (req, res) => {
   res.json({
     success: true,
-    message: "Server is running",
+    message: "Server is running 🚀",
   });
 });
 
-// 🔹 REGISTER ROUTES (THIS WAS MISSING)
-app.use("/api/services", serviceRoutes);               // ✅ ADMIN
-app.use("/api/customer/services", customerServicesRoutes); // ✅ CUSTOMER
+/* =========================
+   🔹 ADMIN ROUTES
+   ========================= */
+app.use("/api/services", serviceRoutes);       // Services (Admin)
+app.use("/api/packages", packageRoutes);       // ✅ Packages (Admin)
 
+/* =========================
+   🔹 CUSTOMER ROUTES
+   ========================= */
+app.use("/api/customer/services", customerServicesRoutes);
+
+/* =========================
+   🔹 AUTH ROUTES
+   ========================= */
 app.use("/api/auth", authRoutes);
 app.use("/api/gallery", galleryRoutes);
 
 app.use("/api/gallery/Customer", CustomerGalleryRoutes);
 
-// Error handler
+// 🔹 Global Error Handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(err.statusCode || 500).json({
@@ -70,7 +80,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Start server
+// 🔹 Start Server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);

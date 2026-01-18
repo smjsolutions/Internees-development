@@ -12,7 +12,7 @@ export default function CreateServiceAdmin() {
     category: "",
     description: "",
     duration: "",
-    pricing: 0,
+    pricing: "", // changed from 0 to empty string
     images: [],
   });
 
@@ -24,8 +24,9 @@ export default function CreateServiceAdmin() {
     setService({ ...service, [name]: value });
   };
 
+  // Pricing is now a string
   const handlePricingChange = (value) => {
-    setService({ ...service, pricing: Number(value) });
+    setService({ ...service, pricing: value });
   };
 
   const handleImageChange = (e) => {
@@ -43,7 +44,11 @@ export default function CreateServiceAdmin() {
       formData.append("category", service.category);
       formData.append("description", service.description);
       formData.append("duration", service.duration);
-      formData.append("pricing", JSON.stringify([service.pricing]));
+
+      // Send pricing as string array
+      formData.append("pricing", service.pricing); // just a string
+
+
       service.images.forEach((img) => formData.append("images", img));
 
       const { data } = await axios.post(`${API_BASE_URL}/api/services`, formData, {
@@ -133,8 +138,8 @@ export default function CreateServiceAdmin() {
             <div>
               <label className="block mb-1 font-medium text-gray-700">Price</label>
               <input
-                type="number"
-                placeholder="Price"
+                type="text" // changed from number to text
+                placeholder="e.g., $50 or ₹5000"
                 value={service.pricing}
                 onChange={(e) => handlePricingChange(e.target.value)}
                 className="w-full sm:w-48 border border-gray-300 p-2 sm:p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"

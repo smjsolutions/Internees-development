@@ -7,16 +7,13 @@ const createService = async (req, res) => {
   try {
     const { name, category, description, duration, pricing } = req.body;
 
-    if (!name || !category || !description || !duration) {
+    if (!name || !category || !description || !duration || !pricing) {
       return res.status(400).json({
         success: false,
         message: "All required fields must be filled",
       });
     }
 
-    const parsedPricing = pricing ? JSON.parse(pricing) : [];
-
-    // Store all uploaded images paths
     const images = req.files?.map(file => file.path) || [];
 
     const service = await Service.create({
@@ -24,7 +21,7 @@ const createService = async (req, res) => {
       category,
       description,
       duration,
-      pricing: parsedPricing,
+      pricing, // directly save as string
       images,
     });
 
@@ -41,6 +38,7 @@ const createService = async (req, res) => {
     });
   }
 };
+
 
 // GET ALL SERVICES
 const getAllServices = async (req, res) => {
@@ -82,8 +80,9 @@ const updateService = async (req, res) => {
     service.description = description || service.description;
     service.duration = duration || service.duration;
 
+    // ✅ store pricing as string
     if (pricing) {
-      service.pricing = JSON.parse(pricing);
+      service.pricing = pricing;
     }
 
     // Handle uploaded images
@@ -113,6 +112,7 @@ const updateService = async (req, res) => {
     });
   }
 };
+
 
 // DELETE SERVICE
 const deleteService = async (req, res) => {

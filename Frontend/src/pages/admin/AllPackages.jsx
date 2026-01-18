@@ -1,30 +1,34 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 import Sidebar from "../../components/admin/SidebarAdmin";
 import Topbar from "../../components/admin/TopbarAdmin";
-import ServicesTableAdmin from "../../components/admin/ServiceTableAdmin";
+import PackageTableAdmin from "../../components/admin/PackageTableAdmin";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-export default function AllServicesAdmin() {
-  const [services, setServices] = useState([]);
+export default function AllPackagesAdmin() {
+  const [packages, setPackages] = useState([]);   // ✅ FIXED
   const [error, setError] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const navigate = useNavigate();
 
-  const fetchServices = async () => {
+  // ✅ FETCH PACKAGES (NOT SERVICES)
+  const fetchPackages = async () => {
     try {
-      const { data } = await axios.get(`${API_BASE_URL}/api/services`);
-      if (data.success) setServices(data.data);
-      else setError("Failed to fetch services");
+      const { data } = await axios.get(`${API_BASE_URL}/api/packages`);
+
+      if (data.success) {
+        setPackages(data.data);
+      } else {
+        setError("Failed to fetch packages");
+      }
     } catch (err) {
-      setError("Error fetching services");
+      console.error(err);
+      setError("Error fetching packages");
     }
   };
 
   useEffect(() => {
-    fetchServices();
+    fetchPackages();
   }, []);
 
   return (
@@ -34,16 +38,15 @@ export default function AllServicesAdmin() {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
-
         <Topbar setSidebarOpen={setSidebarOpen} />
 
         <main className="flex-1 p-4 sm:p-6">
-
           {error && (
             <p className="text-red-600 text-center mb-4">{error}</p>
           )}
 
-          <ServicesTableAdmin services={services} />
+          {/* ✅ PASS PACKAGES */}
+          <PackageTableAdmin packages={packages} />
         </main>
       </div>
     </div>
