@@ -9,6 +9,7 @@ export default function SidebarAdmin({ sidebarOpen, setSidebarOpen }) {
     { name: "Dashboard", path: "/dashboard" },
     { name: "Appointments", path: "/appointments" },
     { name: "Services", path: "/services-admin" },
+    { name: "Packages", path: "/packages-admin" },
   ];
 
   return (
