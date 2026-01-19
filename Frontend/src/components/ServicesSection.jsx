@@ -36,6 +36,7 @@ const ServicesSection = () => {
   return (
     <section className="bg-white py-24 mt-10">
       <div className="max-w-7xl mx-auto container px-4 sm:px-6 lg:px-12">
+
         {/* Heading */}
         <div className="text-center mb-20">
           <p className="text-[#BB8C4B] tracking-widest uppercase mb-3 text-sm sm:text-base">
@@ -59,7 +60,8 @@ const ServicesSection = () => {
                   <img
                     src={`http://localhost:5000/${service.images[0].replace(/\\/g, "/")}`}
                     alt={service.name}
-                    className="w-full h-full object-cover rounded-lg transition-transform duration-300 group-hover:scale-105 group-hover:brightness-90"
+                    className="w-full h-full object-cover rounded-lg transition-all duration-300 
+                    group-hover:scale-105 group-hover:blur-[5px]"
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center bg-gray-100 text-6xl text-[#BB8C4B] rounded-lg">
@@ -67,16 +69,18 @@ const ServicesSection = () => {
                   </div>
                 )}
 
-                {/* Eye icon only clickable area */}
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                {/* Eye icon */}
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 
+                group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
                   <div
                     onClick={(e) => {
                       e.stopPropagation();
                       navigate(`/servicedetail/${service._id}`);
                     }}
-                    className="pointer-events-auto bg-[#BB8C4B] rounded-full p-3 shadow-lg cursor-pointer hover:scale-110 transition-transform duration-200"
+                    className="pointer-events-auto bg-[#BB8C4B] rounded-full p-2 shadow-lg cursor-pointer 
+                    hover:scale-110 transition-transform duration-200"
                   >
-                    <FaEye className="text-white text-4xl sm:text-5xl" />
+                    <FaEye className="text-white text-2xl sm:text-3xl" />
                   </div>
                 </div>
               </div>
@@ -84,26 +88,26 @@ const ServicesSection = () => {
               {/* Service Name */}
               <h3 className="text-lg font-semibold mb-2">{service.name}</h3>
 
-              {/* Price */}
-              {service.pricing && service.pricing.length > 0 && (
+              {/* Pricing */}
+              {service.pricing && (
                 <p className="text-gray-800 mb-4 text-lg font-semibold">
-                  Price: ₹{service.pricing[0]}
+                  Price: {service.pricing}
                 </p>
               )}
 
               {/* Book Now Button */}
-              <div className="flex justify-center">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSelectedService(service);
-                    setIsOpen(true);
-                  }}
-                  className="group relative px-8 sm:px-10 py-3 text-xs sm:text-sm tracking-widest text-black border border-[#D79A4A] transition-all duration-300 hover:bg-[#BB8C4B] hover:text-white flex items-center justify-center gap-2"
-                >
-                  Book Now <FaArrowRight className="inline-block text-xs sm:text-sm" />
-                </button>
-              </div>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedService(service);
+                  setIsOpen(true);
+                }}
+                className="group px-8 py-3 text-xs sm:text-sm tracking-widest text-black border border-[#D79A4A]
+                transition-all duration-300 hover:bg-[#BB8C4B] hover:text-white flex items-center justify-center gap-2 mx-auto"
+              >
+                Book Now
+                <FaArrowRight className="inline-block text-xs sm:text-sm" />
+              </button>
             </div>
           ))}
         </div>
@@ -112,20 +116,21 @@ const ServicesSection = () => {
         <div className="mt-12 text-center">
           <button
             onClick={() => navigate("/services")}
-            className="group relative px-12 sm:px-16 py-4 sm:py-5 bg-[#BB8C4B] text-black text-sm tracking-widest border border-[#D79A4A] font-medium transition-all duration-300 hover:bg-[#A97C42] hover:text-white"
+            className="px-12 py-4 bg-[#BB8C4B] text-black text-sm tracking-widest border border-[#D79A4A]
+            transition-all duration-300 hover:bg-[#A97C42] hover:text-white"
           >
             VIEW ALL SERVICES
           </button>
         </div>
       </div>
 
-      {/* Booking Drawer */}
+      {/* Booking Drawer Popup */}
       {selectedService && (
         <BookingDrawer
           isOpen={isOpen}
           onClose={onClose}
           service={selectedService.name}
-          price={selectedService.pricing?.[0] || 0}
+          price={selectedService.pricing || "0"}
         />
       )}
     </section>

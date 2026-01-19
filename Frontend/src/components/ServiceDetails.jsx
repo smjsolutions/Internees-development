@@ -62,7 +62,6 @@ const ServiceDetails = () => {
 
   return (
     <div className="max-w-7xl container mx-auto pt-[100px] mt-10 mb-10 py-12 px-4 sm:px-6 md:px-8">
-
       <div className="flex flex-col md:flex-row items-center md:items-start gap-10 md:gap-12">
 
         {/* IMAGE SECTION */}
@@ -72,7 +71,7 @@ const ServiceDetails = () => {
               <img
                 src={`${import.meta.env.VITE_API_BASE_URL}/${service.images[0].replace(/\\/g, "/")}`}
                 alt={service.name}
-                className="w-full md:h-[470px] md:object-contain  object-cover rounded-2xl"
+                className="w-full md:h-[470px] md:object-contain object-cover rounded-2xl"
               />
             ) : (
               <div className="text-8xl text-[#BB8C4B] animate-bounce w-full h-full flex items-center justify-center">
@@ -85,7 +84,7 @@ const ServiceDetails = () => {
         {/* TEXT SECTION */}
         <div className="w-full md:w-1/2 flex flex-col items-center md:items-start text-center md:text-left space-y-4 sm:space-y-6">
           
-          <h1 className="text-3xl sm:text-4xl md:text-5xl  font-extrabold text-gray-900">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900">
             {service.name}
           </h1>
 
@@ -99,9 +98,7 @@ const ServiceDetails = () => {
           <div className="mt-4 text-gray-700 text-base sm:text-lg md:text-lg leading-relaxed">
             <p
               ref={descRef}
-              className={`transition-all duration-300 ${
-                !showFullDescription ? "line-clamp-3 overflow-hidden" : ""
-              }`}
+              className={`transition-all duration-300 ${!showFullDescription ? "line-clamp-3 overflow-hidden" : ""}`}
             >
               {service.description}
             </p>
@@ -126,9 +123,9 @@ const ServiceDetails = () => {
             <div className="flex items-center gap-2 mt-2 sm:mt-0">
               <span className="font-semibold text-gray-800">Price:</span>
               <span className="text-gray-600">
-                ${service.pricing && service.pricing.length > 0
-                  ? Number(service.pricing[0]).toLocaleString("en-IN")
-                  : 0}
+                {Array.isArray(service.pricing)
+                  ? service.pricing[0]
+                  : service.pricing || "0"}
               </span>
             </div>
           </div>
@@ -157,7 +154,7 @@ const ServiceDetails = () => {
           isOpen={isOpen}
           onClose={() => setIsOpen(false)}
           service={service.name}
-          price={service.pricing && service.pricing.length > 0 ? service.pricing[0] : 0}
+          price={Array.isArray(service.pricing) ? service.pricing[0] : service.pricing || "0"}
         />
       )}
     </div>

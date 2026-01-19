@@ -1,21 +1,8 @@
 import React, { useState } from "react";
-import {
-  Eye,
-  EyeOff,
-  Mail,
-  Lock,
-  User,
-  Phone,
-  AlertCircle,
-  CheckCircle,
-} from "lucide-react";
+import { Lock, Eye, EyeOff, AlertCircle, CheckCircle } from "lucide-react";
 
-const Register = () => {
+const ResetPassword = () => {
   const [formData, setFormData] = useState({
-    name: "",
-    username: "",
-    email: "",
-    phone: "",
     password: "",
     confirmPassword: "",
   });
@@ -24,6 +11,9 @@ const Register = () => {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+
+  // Get token from URL
+  const token = window.location.pathname.split("/").pop();
 
   const passwordRequirements = [
     { id: 1, text: "At least 8 characters", regex: /.{8,}/ },
@@ -35,23 +25,8 @@ const Register = () => {
 
   const validateForm = () => {
     const newErrors = {};
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const strongPasswordRegex =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-
-    if (!formData.name.trim()) {
-      newErrors.name = "Name is required";
-    }
-
-    if (formData.username && formData.username.length < 3) {
-      newErrors.username = "Username must be at least 3 characters";
-    }
-
-    if (!formData.email) {
-      newErrors.email = "Email is required";
-    } else if (!emailRegex.test(formData.email)) {
-      newErrors.email = "Invalid email format";
-    }
 
     if (!formData.password) {
       newErrors.password = "Password is required";
@@ -90,45 +65,24 @@ const Register = () => {
       const response = await fetch(
         `${
           import.meta.env.VITE_API_URL || "http://localhost:5000/api"
-        }/auth/register`,
+        }/auth/reset-password/${token}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            name: formData.name,
-            username: formData.username || undefined,
-            email: formData.email,
-            phone: formData.phone || undefined,
-            password: formData.password,
-          }),
+          body: JSON.stringify({ password: formData.password }),
         }
       );
 
       const data = await response.json();
 
       if (!response.ok) {
-        if (data.errors) {
-          const fieldErrors = {};
-          data.errors.forEach((err) => {
-            fieldErrors[err.param] = err.msg;
-          });
-          setErrors(fieldErrors);
-        } else {
-          throw new Error(data.message || "Registration failed");
-        }
-        return;
+        throw new Error(data.message || "Failed to reset password");
       }
 
       setSuccess(true);
-
-      // Store tokens
-      localStorage.setItem("accessToken", data.accessToken);
-      localStorage.setItem("refreshToken", data.refreshToken);
-      localStorage.setItem("user", JSON.stringify(data.user));
-
       setTimeout(() => {
-        window.location.href = "/";
-      }, 2000);
+        window.location.href = "/login";
+      }, 3000);
     } catch (error) {
       setErrors({ form: error.message });
     } finally {
@@ -138,7 +92,7 @@ const Register = () => {
 
   return (
     <div
-      className="flex items-center justify-center min-h-screen p-4"
+      className="min-h-screen flex items-center justify-center p-4"
       style={{
         background: "linear-gradient(135deg, #222227 0%, #303133 100%)",
       }}
@@ -154,22 +108,22 @@ const Register = () => {
       </div>
 
       <div className="relative w-full max-w-md">
-        <div className="mb-8 text-center">
+        <div className="text-center mb-8">
           {/* <div
-            className="inline-block p-1 mb-4 rounded-full"
+            className="inline-block p-1 rounded-full mb-4"
             style={{
               background: "linear-gradient(135deg, #BB8C4B 0%, #BB8C4B 100%)",
             }}
           >
             <div
-              className="p-4 rounded-full"
+              className="rounded-full p-4"
               style={{ backgroundColor: "#222227" }}
             >
               <div className="text-4xl">💎</div>
             </div>
           </div> */}
           <h1
-            className="mb-2 text-3xl font-bold md:text-4xl"
+            className="text-3xl md:text-4xl font-bold mb-2"
             style={{
               background: "linear-gradient(135deg, #BB8C4B 0%, #DDDDDD 100%)",
               WebkitBackgroundClip: "text",
@@ -184,7 +138,7 @@ const Register = () => {
         </div>
 
         <div
-          className="overflow-hidden shadow-2xl rounded-2xl"
+          className="rounded-2xl shadow-2xl overflow-hidden"
           style={{
             backgroundColor: "#303133",
             borderWidth: "1px",
@@ -201,18 +155,18 @@ const Register = () => {
 
           <div className="p-8">
             <h2
-              className="mb-2 text-2xl font-bold"
+              className="text-2xl font-bold mb-2"
               style={{ color: "#FFFFFF" }}
             >
-              Create Account
+              Reset Password
             </h2>
-            <p className="mb-6 text-sm" style={{ color: "#999999" }}>
-              Join Diamond Trim Beauty Studio
+            <p className="text-sm mb-6" style={{ color: "#999999" }}>
+              Enter your new password
             </p>
 
             {errors.form && (
               <div
-                className="flex items-start gap-2 p-3 mb-4 rounded-lg"
+                className="mb-4 p-3 rounded-lg flex items-start gap-2"
                 style={{
                   backgroundColor: "rgba(239, 68, 68, 0.1)",
                   borderWidth: "1px",
@@ -220,7 +174,7 @@ const Register = () => {
                 }}
               >
                 <AlertCircle
-                  className="flex-shrink-0 w-5 h-5"
+                  className="w-5 h-5 flex-shrink-0"
                   style={{ color: "#ef4444" }}
                 />
                 <p className="text-sm" style={{ color: "#ef4444" }}>
@@ -231,7 +185,7 @@ const Register = () => {
 
             {success && (
               <div
-                className="flex items-start gap-2 p-3 mb-4 rounded-lg"
+                className="mb-4 p-3 rounded-lg flex items-start gap-2"
                 style={{
                   backgroundColor: "rgba(34, 197, 94, 0.1)",
                   borderWidth: "1px",
@@ -239,166 +193,27 @@ const Register = () => {
                 }}
               >
                 <CheckCircle
-                  className="flex-shrink-0 w-5 h-5"
+                  className="w-5 h-5 flex-shrink-0"
                   style={{ color: "#22c55e" }}
                 />
                 <p className="text-sm" style={{ color: "#22c55e" }}>
-                  Registration successful! Check your email for verification.
+                  Password reset successful! Redirecting to login...
                 </p>
               </div>
             )}
 
             <div className="space-y-4">
-              {/* Name */}
+              {/* New Password */}
               <div>
                 <label
-                  className="block mb-2 text-sm font-medium"
+                  className="block text-sm font-medium mb-2"
                   style={{ color: "#DDDDDD" }}
                 >
-                  Full Name *
-                </label>
-                <div className="relative">
-                  <User
-                    className="absolute w-5 h-5 transform -translate-y-1/2 left-3 top-1/2"
-                    style={{ color: "#777777" }}
-                  />
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    disabled={loading}
-                    className="w-full px-12 py-3 transition-colors rounded-lg focus:outline-none"
-                    style={{
-                      backgroundColor: "#222227",
-                      borderWidth: "1px",
-                      borderColor: errors.name ? "#ef4444" : "#777777",
-                      color: "#FFFFFF",
-                    }}
-                    placeholder="John Doe"
-                  />
-                </div>
-                {errors.name && (
-                  <p className="mt-1 text-xs" style={{ color: "#ef4444" }}>
-                    {errors.name}
-                  </p>
-                )}
-              </div>
-
-              {/* Username (Optional) */}
-              <div>
-                <label
-                  className="block mb-2 text-sm font-medium"
-                  style={{ color: "#DDDDDD" }}
-                >
-                  Username (optional)
-                </label>
-                <div className="relative">
-                  <User
-                    className="absolute w-5 h-5 transform -translate-y-1/2 left-3 top-1/2"
-                    style={{ color: "#777777" }}
-                  />
-                  <input
-                    type="text"
-                    name="username"
-                    value={formData.username}
-                    onChange={handleChange}
-                    disabled={loading}
-                    className="w-full px-12 py-3 rounded-lg focus:outline-none"
-                    style={{
-                      backgroundColor: "#222227",
-                      borderWidth: "1px",
-                      borderColor: errors.username ? "#ef4444" : "#777777",
-                      color: "#FFFFFF",
-                    }}
-                    placeholder="johndoe"
-                  />
-                </div>
-                {errors.username && (
-                  <p className="mt-1 text-xs" style={{ color: "#ef4444" }}>
-                    {errors.username}
-                  </p>
-                )}
-              </div>
-
-              {/* Email */}
-              <div>
-                <label
-                  className="block mb-2 text-sm font-medium"
-                  style={{ color: "#DDDDDD" }}
-                >
-                  Email Address *
-                </label>
-                <div className="relative">
-                  <Mail
-                    className="absolute w-5 h-5 transform -translate-y-1/2 left-3 top-1/2"
-                    style={{ color: "#777777" }}
-                  />
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    disabled={loading}
-                    className="w-full px-12 py-3 rounded-lg focus:outline-none"
-                    style={{
-                      backgroundColor: "#222227",
-                      borderWidth: "1px",
-                      borderColor: errors.email ? "#ef4444" : "#777777",
-                      color: "#FFFFFF",
-                    }}
-                    placeholder="john@example.com"
-                  />
-                </div>
-                {errors.email && (
-                  <p className="mt-1 text-xs" style={{ color: "#ef4444" }}>
-                    {errors.email}
-                  </p>
-                )}
-              </div>
-
-              {/* Phone (Optional) */}
-              <div>
-                <label
-                  className="block mb-2 text-sm font-medium"
-                  style={{ color: "#DDDDDD" }}
-                >
-                  Phone (optional)
-                </label>
-                <div className="relative">
-                  <Phone
-                    className="absolute w-5 h-5 transform -translate-y-1/2 left-3 top-1/2"
-                    style={{ color: "#777777" }}
-                  />
-                  <input
-                    type="tel"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    disabled={loading}
-                    className="w-full px-12 py-3 rounded-lg focus:outline-none"
-                    style={{
-                      backgroundColor: "#222227",
-                      borderWidth: "1px",
-                      borderColor: "#777777",
-                      color: "#FFFFFF",
-                    }}
-                    placeholder="+92 300 1234567"
-                  />
-                </div>
-              </div>
-
-              {/* Password */}
-              <div>
-                <label
-                  className="block mb-2 text-sm font-medium"
-                  style={{ color: "#DDDDDD" }}
-                >
-                  Password *
+                  New Password
                 </label>
                 <div className="relative">
                   <Lock
-                    className="absolute w-5 h-5 transform -translate-y-1/2 left-3 top-1/2"
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5"
                     style={{ color: "#777777" }}
                   />
                   <input
@@ -406,8 +221,8 @@ const Register = () => {
                     name="password"
                     value={formData.password}
                     onChange={handleChange}
-                    disabled={loading}
-                    className="w-full px-12 py-3 rounded-lg focus:outline-none"
+                    disabled={loading || success}
+                    className="w-full rounded-lg py-3 px-12 focus:outline-none"
                     style={{
                       backgroundColor: "#222227",
                       borderWidth: "1px",
@@ -419,7 +234,7 @@ const Register = () => {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute transform -translate-y-1/2 right-3 top-1/2"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2"
                     style={{ color: "#777777" }}
                   >
                     {showPassword ? (
@@ -456,7 +271,7 @@ const Register = () => {
                   ))}
                 </div>
                 {errors.password && (
-                  <p className="mt-1 text-xs" style={{ color: "#ef4444" }}>
+                  <p className="text-xs mt-1" style={{ color: "#ef4444" }}>
                     {errors.password}
                   </p>
                 )}
@@ -465,14 +280,14 @@ const Register = () => {
               {/* Confirm Password */}
               <div>
                 <label
-                  className="block mb-2 text-sm font-medium"
+                  className="block text-sm font-medium mb-2"
                   style={{ color: "#DDDDDD" }}
                 >
-                  Confirm Password *
+                  Confirm Password
                 </label>
                 <div className="relative">
                   <Lock
-                    className="absolute w-5 h-5 transform -translate-y-1/2 left-3 top-1/2"
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5"
                     style={{ color: "#777777" }}
                   />
                   <input
@@ -480,8 +295,8 @@ const Register = () => {
                     name="confirmPassword"
                     value={formData.confirmPassword}
                     onChange={handleChange}
-                    disabled={loading}
-                    className="w-full px-12 py-3 rounded-lg focus:outline-none"
+                    disabled={loading || success}
+                    className="w-full rounded-lg py-3 px-12 focus:outline-none"
                     style={{
                       backgroundColor: "#222227",
                       borderWidth: "1px",
@@ -495,7 +310,7 @@ const Register = () => {
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute transform -translate-y-1/2 right-3 top-1/2"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2"
                     style={{ color: "#777777" }}
                   >
                     {showConfirmPassword ? (
@@ -506,18 +321,17 @@ const Register = () => {
                   </button>
                 </div>
                 {errors.confirmPassword && (
-                  <p className="mt-1 text-xs" style={{ color: "#ef4444" }}>
+                  <p className="text-xs mt-1" style={{ color: "#ef4444" }}>
                     {errors.confirmPassword}
                   </p>
                 )}
               </div>
 
-              {/* Submit Button */}
               <button
                 type="button"
                 onClick={handleSubmit}
                 disabled={loading || success}
-                className="w-full py-3 font-bold transition-all duration-300 rounded-lg"
+                className="w-full font-bold py-3 rounded-lg transition-all duration-300"
                 style={{
                   background:
                     loading || success
@@ -528,24 +342,11 @@ const Register = () => {
                 }}
               >
                 {loading
-                  ? "Creating Account..."
+                  ? "Resetting..."
                   : success
-                  ? "Redirecting..."
-                  : "Create Account"}
+                  ? "Success!"
+                  : "Reset Password"}
               </button>
-            </div>
-
-            <div className="mt-6 text-center">
-              <p className="text-sm" style={{ color: "#999999" }}>
-                Already have an account?{" "}
-                <a
-                  href="/login"
-                  className="font-medium"
-                  style={{ color: "#BB8C4B" }}
-                >
-                  Sign In
-                </a>
-              </p>
             </div>
           </div>
         </div>
@@ -554,4 +355,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default ResetPassword;

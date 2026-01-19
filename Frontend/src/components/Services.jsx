@@ -14,14 +14,12 @@ const Services = () => {
 
   const onClose = () => setIsOpen(false);
 
-  // Fetch services from backend
   useEffect(() => {
     const fetchServices = async () => {
       try {
         const response = await axios.get(
           `${import.meta.env.VITE_API_BASE_URL}/api/customer/services`
         );
-
         if (response.data.success) {
           setServices(response.data.data);
         } else {
@@ -33,7 +31,6 @@ const Services = () => {
         setLoading(false);
       }
     };
-
     fetchServices();
   }, []);
 
@@ -42,6 +39,7 @@ const Services = () => {
   return (
     <section className="bg-gray-100 py-24 mt-10 px-4 sm:px-6 lg:px-20">
       <div className="max-w-7xl mx-auto">
+
         {/* Heading */}
         <div className="text-center mb-20">
           <h1 className="text-3xl sm:text-4xl font-serif text-black">All Services</h1>
@@ -63,7 +61,8 @@ const Services = () => {
                   <img
                     src={`http://localhost:5000/${service.images[0].replace(/\\/g, "/")}`}
                     alt={service.name}
-                    className="w-full h-full object-cover rounded-lg transition-transform duration-300 group-hover:scale-105 group-hover:brightness-90"
+                    className="w-full h-full object-cover rounded-lg transition-all duration-300
+                    group-hover:scale-105 group-hover:blur-[5px]"
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center bg-gray-100 text-6xl text-[#BB8C4B] rounded-lg">
@@ -71,16 +70,18 @@ const Services = () => {
                   </div>
                 )}
 
-                {/* Eye icon only clickable */}
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                {/* Eye icon */}
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 
+                group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
                   <div
                     onClick={(e) => {
                       e.stopPropagation();
                       navigate(`/servicedetail/${service._id}`);
                     }}
-                    className="pointer-events-auto bg-[#BB8C4B] rounded-full p-3 shadow-lg cursor-pointer hover:scale-110 transition-transform duration-200"
+                    className="pointer-events-auto bg-[#BB8C4B] rounded-full p-2 shadow-lg cursor-pointer 
+                    hover:scale-110 transition-transform duration-200"
                   >
-                    <FaEye className="text-white text-4xl sm:text-5xl" />
+                    <FaEye className="text-white text-2xl sm:text-3xl" />
                   </div>
                 </div>
               </div>
@@ -90,27 +91,27 @@ const Services = () => {
 
               {/* Pricing */}
               <div className="mt-4">
-                {service.pricing && service.pricing.length > 0 ? (
-                  service.pricing.map((price, i) => (
-                    <p key={i}>Price: ₹{price}</p>
-                  ))
+                {service.pricing ? (
+                  <p>Price: {service.pricing}</p>
                 ) : (
                   <p>No pricing available</p>
                 )}
+              </div>
 
-                {/* Book Now Button */}
-                <div className="mt-4 flex justify-center">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedService(service);
-                      setIsOpen(true);
-                    }}
-                    className="group relative px-8 sm:px-10 py-3 text-xs sm:text-sm tracking-widest text-black border border-[#D79A4A] transition-all duration-300 hover:bg-[#BB8C4B] hover:text-white flex items-center justify-center gap-2"
-                  >
-                    Book Now <FaArrowRight className="inline-block text-xs sm:text-sm" />
-                  </button>
-                </div>
+              {/* Book Now Button */}
+              <div className="mt-4 flex justify-center">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedService(service);
+                    setIsOpen(true);
+                  }}
+                  className="group relative px-8 sm:px-10 py-3 text-xs sm:text-sm tracking-widest text-black 
+                  border border-[#D79A4A] transition-all duration-300 hover:bg-[#BB8C4B] hover:text-white 
+                  flex items-center justify-center gap-2"
+                >
+                  Book Now <FaArrowRight className="inline-block text-xs sm:text-sm" />
+                </button>
               </div>
             </div>
           ))}
@@ -123,7 +124,7 @@ const Services = () => {
           isOpen={isOpen}
           onClose={onClose}
           service={selectedService.name}
-          price={selectedService.pricing?.[0] || 0}
+          price={selectedService.pricing || "0"}
         />
       )}
     </section>

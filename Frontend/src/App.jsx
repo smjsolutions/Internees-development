@@ -19,12 +19,11 @@ import PackageDetails from "./pages/admin/PackageDetail";
 
 
 // User-facing Services
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
+
 import ServicePage from "./pages/ServicePage";
 import ServicesDetailPage from "./pages/ServicesDetailPage";
-import Addgalleryimage from "./pages/admin/Addgalleryimage";
-import AllGalleryimagesAdmin from "./pages/admin/AllGalleryimagesAdmin"
-import UpdateGalleryAdmin from "./pages/admin/UpdateGalleryAdmin";
-
 
 export default function App() {
   return (
@@ -35,6 +34,8 @@ export default function App() {
       <Route path="/register" element={<RegisterPage />} />
 
       {/* Admin Dashboard */}
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password/:token" element={<ResetPassword />} />
       <Route path="/dashboard" element={<Dashboard />} />
 
       {/* Services Admin */}
@@ -50,12 +51,9 @@ export default function App() {
       <Route path="/package-details/:id" element={<PackageDetails />} />
 
           <Route path="/services" element={<ServicePage />} />
+      <Route path="/services" element={<ServicePage />} />
       <Route path="/servicedetail/:id" element={<ServicesDetailPage />} />
-
-      {/* Gallery Add Image */}
-      <Route path="/gallery-admin/add" element={<Addgalleryimage />} />
-      <Route path="/gallery-admin" element={<AllGalleryimagesAdmin />} />
-      <Route path="/gallery/edit/:id" element={<UpdateGalleryAdmin />} />
+      <Route path="/update-service/:id" element={<UpdateService />} />
     </Routes>
   );
 }
