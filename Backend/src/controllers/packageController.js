@@ -73,7 +73,18 @@ const updatePackage = async (req, res) => {
     });
   }
 };
+ const getCustomerPackages = async (req, res) => {
+  try {
+    const packages = await Package.find({ active: true });
 
+    res.status(200).json(packages);
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to fetch customer packages",
+      error: error.message,
+    });
+  }
+};
 /* ================= GET ALL PACKAGES (ADMIN) ================= */
 const getAllPackagesAdmin = async (req, res) => {
   try {
@@ -158,6 +169,7 @@ module.exports = {
   createPackage,
   updatePackage,
   getAllPackagesAdmin,
+  getCustomerPackages,
   togglePackageStatus,
   deletePackage,
 };

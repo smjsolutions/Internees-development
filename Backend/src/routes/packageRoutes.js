@@ -8,6 +8,7 @@ const {
   updatePackage,
   getAllPackagesAdmin,
   togglePackageStatus,
+  getCustomerPackages,
   deletePackage,
 } = require("../controllers/packageController");
 
@@ -16,6 +17,7 @@ router.post("/", uploadPackage.single("image"), createPackage);
 
 // READ (ADMIN)
 router.get("/", getAllPackagesAdmin);
+router.get("/customer", getCustomerPackages);
 
 // UPDATE
 router.put("/:id", uploadPackage.single("image"), updatePackage);

@@ -24,12 +24,14 @@ import ResetPassword from "./pages/ResetPassword";
 
 import ServicePage from "./pages/ServicePage";
 import ServicesDetailPage from "./pages/ServicesDetailPage";
+import PackageDetailPage from "./pages/PackageDetailPage";
 
 export default function App() {
   return (
     <Routes>
       {/* Public Routes */}
       <Route path="/" element={<Home />} />
+      <Route path="/packages/:id" element={<PackageDetailPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
 
@@ -54,6 +56,7 @@ export default function App() {
       <Route path="/services" element={<ServicePage />} />
       <Route path="/servicedetail/:id" element={<ServicesDetailPage />} />
       <Route path="/update-service/:id" element={<UpdateService />} />
+     
     </Routes>
   );
 }
