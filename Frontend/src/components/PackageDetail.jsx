@@ -64,6 +64,21 @@ const PackageDetail = () => {
               Included Services
             </h3>
 
+<<<<<<< HEAD
+{pkg.services.map((service) => (
+  <li
+    key={service._id}
+    className="flex justify-between border-b pb-2 text-sm"
+  >
+    <span>{service.name}</span>
+    <span className="text-gray-500">
+      {service.duration} • Rs. {service.price}
+    </span>
+  </li>
+))}
+
+
+=======
             <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {pkg.services.map((service, index) => (
                 <li key={index} className="flex gap-2">
@@ -72,6 +87,7 @@ const PackageDetail = () => {
                 </li>
               ))}
             </ul>
+>>>>>>> origin/master
 
             <button className="bg-[#c0954d] text-white py-3 px-8 rounded-md mt-6">
               Book This Package
