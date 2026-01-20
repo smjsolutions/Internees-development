@@ -66,12 +66,12 @@ const ServiceDetails = () => {
 
         {/* IMAGE SECTION */}
         <div className="w-full md:w-1/2 flex justify-center">
-          <div className="w-full h-[250px] sm:h-[380px] md:h-auto overflow-hidden rounded-2xl">
+          <div className="w-full h-[300px] sm:h-[350px]  md:h-[400px] overflow-hidden rounded-2xl">
             {service.images && service.images.length > 0 ? (
               <img
                 src={`${import.meta.env.VITE_API_BASE_URL}/${service.images[0].replace(/\\/g, "/")}`}
                 alt={service.name}
-                className="w-full md:h-[470px] md:object-contain object-cover rounded-2xl"
+                className="w-full h-full object-cover rounded-2xl"
               />
             ) : (
               <div className="text-8xl text-[#BB8C4B] animate-bounce w-full h-full flex items-center justify-center">
