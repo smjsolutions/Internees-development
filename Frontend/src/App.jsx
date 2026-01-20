@@ -65,7 +65,7 @@ export default function App() {
         <Route path="/gallery-admin/add" element={<Addgalleryimage />} />
          <Route path="/gallery-admin" element={<AllGalleryimageAdmin/>} />
          <Route path="/gallery/edit/:id" element={<UpdateGalleryAdmin />} />
-         <Route path="/cutomergallery" element={<CustomerGallerypage/>} />
+         <Route path="/customergallery" element={<CustomerGallerypage/>} />
          
       
 
