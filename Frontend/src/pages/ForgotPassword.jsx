@@ -10,6 +10,11 @@ const ForgotPassword = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Clear previous states
+    setError("");
+    setSuccess(false);
+
+    // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email) {
       setError("Email is required");
@@ -21,7 +26,6 @@ const ForgotPassword = () => {
     }
 
     setLoading(true);
-    setError("");
 
     try {
       const response = await fetch(
@@ -32,18 +36,26 @@ const ForgotPassword = () => {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email }),
-        }
+        },
       );
 
       const data = await response.json();
 
+      // Check if request failed
       if (!response.ok) {
-        throw new Error(data.message || "Failed to send reset email");
+        // Set error and stop execution
+        setError(data.message || "Failed to send reset email");
+        setLoading(false);
+        return; // ✅ Important: Stop here on error
       }
 
+      // Only set success if response is ok
       setSuccess(true);
+      setError(""); // Clear any previous errors
     } catch (err) {
-      setError(err.message);
+      // Network error or other issues
+      setError(err.message || "Something went wrong. Please try again.");
+      setSuccess(false);
     } finally {
       setLoading(false);
     }
@@ -68,19 +80,6 @@ const ForgotPassword = () => {
 
       <div className="relative w-full max-w-md">
         <div className="text-center mb-8">
-          {/* <div
-            className="inline-block p-1 rounded-full mb-4"
-            style={{
-              background: "linear-gradient(135deg, #BB8C4B 0%, #BB8C4B 100%)",
-            }}
-          >
-            <div
-              className="rounded-full p-4"
-              style={{ backgroundColor: "#222227" }}
-            >
-              <div className="text-4xl">💎</div>
-            </div>
-          </div> */}
           <h1
             className="text-3xl md:text-4xl font-bold mb-2"
             style={{
@@ -192,6 +191,7 @@ const ForgotPassword = () => {
                     onClick={() => {
                       setSuccess(false);
                       setEmail("");
+                      setError("");
                     }}
                     className="text-sm font-medium transition-colors"
                     style={{ color: "#BB8C4B" }}
@@ -243,6 +243,11 @@ const ForgotPassword = () => {
                           ? "#ef4444"
                           : "#777777")
                       }
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && !loading) {
+                          handleSubmit(e);
+                        }
+                      }}
                     />
                   </div>
                 </div>

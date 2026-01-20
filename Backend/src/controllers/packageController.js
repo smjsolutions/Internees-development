@@ -73,15 +73,13 @@ const updatePackage = async (req, res) => {
     });
   }
 };
-<<<<<<< HEAD
+
 const getCustomerPackages = async (req, res) => {
   try {
-    const packages = await Package.find({ isActive: true, isDeleted: false }).populate("services");
-=======
- const getCustomerPackages = async (req, res) => {
-  try {
-    const packages = await Package.find({ active: true });
->>>>>>> origin/master
+    const packages = await Package.find({
+      isActive: true,
+      isDeleted: false,
+    }).populate("services");
 
     res.status(200).json(packages);
   } catch (error) {
@@ -91,11 +89,7 @@ const getCustomerPackages = async (req, res) => {
     });
   }
 };
-<<<<<<< HEAD
 
-
-=======
->>>>>>> origin/master
 /* ================= GET ALL PACKAGES (ADMIN) ================= */
 const getAllPackagesAdmin = async (req, res) => {
   try {
@@ -127,7 +121,6 @@ const getAllPackagesAdmin = async (req, res) => {
   }
 };
 
-<<<<<<< HEAD
 /* ================= GET SINGLE PACKAGE ================= */
 const getPackageById = async (req, res) => {
   try {
@@ -157,9 +150,6 @@ const getPackageById = async (req, res) => {
   }
 };
 
-
-=======
->>>>>>> origin/master
 /* ================= TOGGLE ACTIVE / INACTIVE ================= */
 const togglePackageStatus = async (req, res) => {
   try {
@@ -214,14 +204,8 @@ module.exports = {
   updatePackage,
   getAllPackagesAdmin,
   getCustomerPackages,
-<<<<<<< HEAD
+
   getPackageById, // ✅ ADD THIS
   togglePackageStatus,
   deletePackage,
 };
-
-=======
-  togglePackageStatus,
-  deletePackage,
-};
->>>>>>> origin/master

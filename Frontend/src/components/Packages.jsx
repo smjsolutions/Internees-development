@@ -13,15 +13,12 @@ const Packages = () => {
     const fetchPackages = async () => {
       try {
         const res = await axios.get(
-          "http://localhost:5000/api/packages/customer"
+          "http://localhost:5000/api/packages/customer",
         );
-<<<<<<< HEAD
+
         // ✅ Filter only active packages
         const activePackages = res.data.filter((pkg) => pkg.isActive);
         setPackages(activePackages);
-=======
-        setPackages(res.data);
->>>>>>> origin/master
       } catch (error) {
         console.error("Failed to fetch packages:", error);
       } finally {
@@ -34,26 +31,19 @@ const Packages = () => {
 
   // SEARCH & CATEGORY FILTER
   const filteredPackages = packages
-    .filter((pkg) =>
-      pkg.name.toLowerCase().includes(search.toLowerCase())
-    )
-    .filter((pkg) =>
-      category === "All" ? true : pkg.category === category
-    );
+    .filter((pkg) => pkg.name.toLowerCase().includes(search.toLowerCase()))
+    .filter((pkg) => (category === "All" ? true : pkg.category === category));
 
   // LOADING STATE
   if (loading) {
     return (
-      <div className="py-20 text-center text-gray-500">
-        Loading packages...
-      </div>
+      <div className="py-20 text-center text-gray-500">Loading packages...</div>
     );
   }
 
   return (
     <section className="bg-[#faf7f2] py-16">
       <div className="max-w-7xl mx-auto px-4">
-
         <h2 className="text-4xl font-serif text-center mb-10">
           Our Premium Packages
         </h2>

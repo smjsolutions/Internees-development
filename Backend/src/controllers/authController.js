@@ -126,6 +126,71 @@ exports.login = async (req, res, next) => {
   }
 };
 
+// @desc    Logout user
+// @route   POST /api/auth/logout
+// @access  Private
+exports.logout = async (req, res, next) => {
+  try {
+    const { refreshToken } = req.body;
+
+    if (refreshToken) {
+      // Remove the specific refresh token
+      req.user.refreshTokens = req.user.refreshTokens.filter(
+        (rt) => rt.token !== refreshToken,
+      );
+      await req.user.save({ validateBeforeSave: false });
+    }
+
+    res.json({
+      success: true,
+      message: "Logged out successfully",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Refresh access token
+// @route   POST /api/auth/refresh-token
+// @access  Public
+exports.refreshToken = async (req, res, next) => {
+  try {
+    const { refreshToken } = req.body;
+
+    if (!refreshToken) {
+      return res.status(401).json({ message: "Refresh token required" });
+    }
+
+    // Verify refresh token
+    const { verifyRefreshToken } = require("../utils/generateToken");
+    const decoded = verifyRefreshToken(refreshToken);
+
+    // Find user and check if token exists
+    const user = await User.findById(decoded.id);
+    if (!user) {
+      return res.status(401).json({ message: "User not found" });
+    }
+
+    const tokenExists = user.refreshTokens.some(
+      (rt) => rt.token === refreshToken,
+    );
+
+    if (!tokenExists) {
+      return res.status(401).json({ message: "Invalid refresh token" });
+    }
+
+    // Generate new access token
+    const accessToken = generateAccessToken(user._id);
+
+    res.json({
+      success: true,
+      accessToken,
+    });
+  } catch (error) {
+    res.status(401).json({ message: "Invalid refresh token" });
+  }
+};
+
 // @desc    Get current user
 // @route   GET /api/auth/me
 // @access  Private
@@ -160,9 +225,26 @@ exports.forgotPassword = async (req, res, next) => {
   try {
     const { email } = req.body;
 
+    // Validate email format first
+    const emailRegex = /^\S+@\S+\.\S+$/;
+    if (!email) {
+      return res.status(400).json({
+        message: "Email is required",
+      });
+    }
+
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({
+        message: "Please provide a valid email address",
+      });
+    }
+
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(404).json({ message: "No user found with this email" });
+      return res.status(404).json({
+        message:
+          "No account found with this email address. Please check and try again.",
+      });
     }
 
     // Generate reset token
@@ -263,6 +345,29 @@ exports.resetPassword = async (req, res, next) => {
     const { password } = req.body;
     const { token } = req.params;
 
+    // Validate password
+    if (!password) {
+      return res.status(400).json({
+        message: "Password is required",
+      });
+    }
+
+    if (password.length < 8) {
+      return res.status(400).json({
+        message: "Password must be at least 8 characters",
+      });
+    }
+
+    // Validate password strength
+    const strongPasswordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/;
+    if (!strongPasswordRegex.test(password)) {
+      return res.status(400).json({
+        message:
+          "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
+      });
+    }
+
     const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
 
     const user = await User.findOne({
@@ -271,19 +376,92 @@ exports.resetPassword = async (req, res, next) => {
     });
 
     if (!user) {
-      return res
-        .status(400)
-        .json({ message: "Invalid or expired reset token" });
+      return res.status(400).json({
+        message:
+          "Invalid or expired reset token. Please request a new password reset link.",
+      });
     }
 
+    // Set new password
     user.password = password;
     user.resetPasswordToken = undefined;
     user.resetPasswordExpire = undefined;
+
+    // Clear all refresh tokens (force re-login on all devices)
+    user.refreshTokens = [];
+
     await user.save();
 
     res.json({
       success: true,
-      message: "Password reset successful",
+      message:
+        "Password reset successful. You can now login with your new password.",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Change password (logged in user)
+// @route   POST /api/auth/change-password
+// @access  Private
+exports.changePassword = async (req, res, next) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+
+    // Validate inputs
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({
+        message: "Current password and new password are required",
+      });
+    }
+
+    if (newPassword.length < 8) {
+      return res.status(400).json({
+        message: "New password must be at least 8 characters",
+      });
+    }
+
+    // Validate password strength
+    const strongPasswordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/;
+    if (!strongPasswordRegex.test(newPassword)) {
+      return res.status(400).json({
+        message:
+          "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
+      });
+    }
+
+    // Get user with password
+    const user = await User.findById(req.user._id).select("+password");
+
+    // Verify current password
+    const isMatch = await user.comparePassword(currentPassword);
+    if (!isMatch) {
+      return res.status(401).json({
+        message: "Current password is incorrect",
+      });
+    }
+
+    // Check if new password is same as current
+    if (currentPassword === newPassword) {
+      return res.status(400).json({
+        message: "New password must be different from current password",
+      });
+    }
+
+    // Update password
+    user.password = newPassword;
+
+    // Clear all refresh tokens (force re-login on all devices)
+    user.refreshTokens = [];
+
+    await user.save();
+
+    res.json({
+      success: true,
+      message:
+        "Password changed successfully. Please login again with your new password.",
     });
   } catch (error) {
     next(error);
