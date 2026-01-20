@@ -28,7 +28,9 @@ import AllGalleryimageAdmin from "./pages/admin/AllGalleryimagesAdmin"
 import UpdateGalleryAdmin  from "./pages/admin/UpdateGalleryAdmin"
 
 import PackageDetailPage from "./pages/PackageDetailPage";
-import CustomerGallery from "./components/CustomerGallery";
+
+import CustomerGallerypage from "./pages/CustomerGallerypage";
+
 
 export default function App() {
   return (
@@ -63,8 +65,7 @@ export default function App() {
         <Route path="/gallery-admin/add" element={<Addgalleryimage />} />
          <Route path="/gallery-admin" element={<AllGalleryimageAdmin/>} />
          <Route path="/gallery/edit/:id" element={<UpdateGalleryAdmin />} />
-         <Route path="/gallery/edit/:id" element={<UpdateGalleryAdmin />} />
-         <Route path="/cutomergallery" element={<CustomerGallery/>} />
+         <Route path="/cutomergallery" element={<CustomerGallerypage/>} />
          
       
 

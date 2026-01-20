@@ -1,149 +1,91 @@
-import React from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import PackageCard from "../components/PackageCard";
 
 const Packages = () => {
+  const [packages, setPackages] = useState([]);
+  const [search, setSearch] = useState("");
+  const [category, setCategory] = useState("All");
+  const [loading, setLoading] = useState(true);
+
+  // FETCH PACKAGES FROM BACKEND (CUSTOMER SIDE)
+  useEffect(() => {
+    const fetchPackages = async () => {
+      try {
+        const res = await axios.get(
+          "http://localhost:5000/api/packages/customer"
+        );
+        setPackages(res.data);
+      } catch (error) {
+        console.error("Failed to fetch packages:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPackages();
+  }, []);
+
+  // SEARCH & CATEGORY FILTER
+  const filteredPackages = packages
+    .filter((pkg) =>
+      pkg.name.toLowerCase().includes(search.toLowerCase())
+    )
+    .filter((pkg) =>
+      category === "All" ? true : pkg.category === category
+    );
+
+  // LOADING STATE
+  if (loading) {
+    return (
+      <div className="py-20 text-center text-gray-500">
+        Loading packages...
+      </div>
+    );
+  }
+
   return (
-    <section className="bg-[#faf7f2] mt-10 py-16">
-      <div className="max-w-7xl mx-auto container  px-4 sm:px-6 lg:px-12 ">
-        <div className="grid md:grid-cols-2 gap-12">
-          {/* GOLD PACKAGE */}
-          <div>
-            {/* Header */}
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="text-2xl font-serif uppercase tracking-wide">
-                Gold Package{" "}
-                <span className="text-base normal-case">( 2 Days )</span>
-              </h2>
-              <span className="text-4xl font-bold text-[#c0954d]">20000/-</span>
-            </div>
+    <section className="bg-[#faf7f2] py-16">
+      <div className="max-w-7xl mx-auto px-4">
 
-            {/* Content */}
-            <div className="grid grid-cols-2 gap-6 text-gray-600">
-              <ul className="space-y-3 list-disc list-inside">
-                <li>Hair Cut (800 - 1500)</li>
-                <li>Neck Polish</li>
-                <li>Pedicure Simple</li>
-                <li>Makeover</li>
-                <li>Shower & Refresh</li>
-                <li>Hand Polish</li>
-                <li>
-                  Shower & Refresh (even skin tone + diamond face wash + body
-                  wash)
-                </li>
-              </ul>
+        <h2 className="text-4xl font-serif text-center mb-10">
+          Our Premium Packages
+        </h2>
 
-              <ul className="space-y-3 list-disc list-inside">
-                <li>Shave / Beard</li>
-                <li>Manicure</li>
-                <li>Even Skin Tone (facial)</li>
-                <li>Styling</li>
-                <li>Cleansing</li>
-                <li>Foot Polish</li>
-              </ul>
-            </div>
+        {/* SEARCH & FILTER */}
+        <div className="flex flex-col md:flex-row gap-4 mb-10">
+          <input
+            type="text"
+            placeholder="Search packages..."
+            className="p-3 rounded-md border w-full"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
 
-            {/* Button */}
-            <button
-              className="mt-10 bg-[#c0954d] text-white px-8 py-3 font-semibold 
-            hover:bg-[#a77e3f] transition-all duration-300 rounded-md
-            hover:scale-105 active:scale-95 shadow-md hover:shadow-lg"
-            >
-              BOOK NOW
-            </button>
-          </div>
-
-          {/* PLATINUM PACKAGE */}
-          <div>
-            {/* Header */}
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="text-2xl font-serif uppercase tracking-wide">
-                Platinum Package{" "}
-                <span className="text-base normal-case">( 3 Days )</span>
-              </h2>
-              <span className="text-4xl font-bold text-[#c0954d]">25000/-</span>
-            </div>
-
-            {/* Content */}
-            <div className="grid grid-cols-2 gap-6 text-gray-600">
-              <ul className="space-y-3 list-disc list-inside">
-                <li>Hair Cut (800 - 1500)</li>
-                <li>Signature Pedicure</li>
-                <li>Manicure</li>
-                <li>Cleansing (dry skin)</li>
-                <li>Foot Polish</li>
-                <li>Head & Shoulder Massage (with aromatic)</li>
-              </ul>
-
-              <ul className="space-y-3 list-disc list-inside">
-                <li>Shave / Beard</li>
-                <li>Even Skin Tone (with mask)</li>
-                <li>
-                  Styling Shower & Refresh (with fresh towel, refresh face &
-                  wash, refresh body)
-                </li>
-                <li>Hand Polish</li>
-                <li>Styling</li>
-              </ul>
-            </div>
-
-            {/* Button */}
-            <button
-              className="mt-10 bg-[#c0954d] text-white px-8 py-3 font-semibold 
-            hover:bg-[#a77e3f] transition-all duration-300  rounded-md
-                hover:scale-105 active:scale-95 shadow-md hover:shadow-lg"
-            >
-              BOOK NOW
-            </button>
-          </div>
-          {/* DIAMOND PACKAGE */}
-          {/* DIAMOND PACKAGE */}
-          <div>
-            {/* Header */}
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="text-2xl font-serif uppercase tracking-wide">
-                Diamond Package{" "}
-                <span className="text-base normal-case">( 4 Days )</span>
-              </h2>
-              <span className="text-4xl font-bold text-[#c0954d]">35000/-</span>
-            </div>
-
-            {/* Content */}
-            <div className="grid grid-cols-2 gap-6 text-gray-600">
-              <ul className="space-y-3 list-disc list-inside">
-                <li>Hair Cut ( 800 - 1500 )</li>
-                <li>Signature Manicure</li>
-                <li>Skin Brightening (Luminous)</li>
-                <li>Shower & Refresh</li>
-                <li>Styling</li>
-                <li>Foot Polish</li>
-                <li>Head & Shoulder Massage (with aromatic)</li>
-                <li>
-                  Shower & Refresh (30 min total: 15 min face + 15 min body)
-                </li>
-              </ul>
-
-              <ul className="space-y-3 list-disc list-inside">
-                <li>Shave / Beard</li>
-                <li>Signature Pedicure</li>
-                <li>Rejex Rejuv</li>
-                <li>Cleansing</li>
-                <li>Hand Polish</li>
-                <li>Makeover</li>
-                <li>
-                  Foot Massage (30 min not water edge & 30 min massage only)
-                </li>
-              </ul>
-            </div>
-
-            {/* Button */}
-            <button
-              className="mt-10 bg-[#c0954d] text-white px-8 py-3 font-semibold 
-            hover:bg-[#a77e3f] transition-all duration-300 rounded-md
-            hover:scale-105 active:scale-95 shadow-md hover:shadow-lg"
-            >
-              BOOK NOW
-            </button>
-          </div>
+          <select
+            className="p-3 rounded-md border"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+          >
+            <option value="All">All</option>
+            <option value="Basic">Basic</option>
+            <option value="Premium">Premium</option>
+            <option value="Luxury">Luxury</option>
+          </select>
         </div>
+
+        {/* PACKAGES GRID */}
+        {filteredPackages.length === 0 ? (
+          <p className="text-center text-gray-500">
+            No packages available at the moment.
+          </p>
+        ) : (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredPackages.map((pkg) => (
+              <PackageCard key={pkg._id} pkg={pkg} />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
