@@ -17,14 +17,20 @@ import CreatePackage from "./pages/admin/CreatePackage";
 import UpdatePackage from "./pages/admin/UpdatePackage";
 import PackageDetails from "./pages/admin/PackageDetail";
 
-
 // User-facing Services
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 
 import ServicePage from "./pages/ServicePage";
 import ServicesDetailPage from "./pages/ServicesDetailPage";
+import Addgalleryimage from "./pages/admin/Addgalleryimage";
+import AllGalleryimageAdmin from "./pages/admin/AllGalleryimagesAdmin"
+import UpdateGalleryAdmin  from "./pages/admin/UpdateGalleryAdmin"
+
 import PackageDetailPage from "./pages/PackageDetailPage";
+
+import CustomerGallerypage from "./pages/CustomerGallerypage";
+
 
 export default function App() {
   return (
@@ -56,6 +62,13 @@ export default function App() {
       <Route path="/services" element={<ServicePage />} />
       <Route path="/servicedetail/:id" element={<ServicesDetailPage />} />
       <Route path="/update-service/:id" element={<UpdateService />} />
+        <Route path="/gallery-admin/add" element={<Addgalleryimage />} />
+         <Route path="/gallery-admin" element={<AllGalleryimageAdmin/>} />
+         <Route path="/gallery/edit/:id" element={<UpdateGalleryAdmin />} />
+         <Route path="/cutomergallery" element={<CustomerGallerypage/>} />
+         
+      
+
      
     </Routes>
   );

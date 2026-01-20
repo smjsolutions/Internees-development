@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 export default function AddGalleryImage() {
   const [title, setTitle] = useState("");
@@ -7,6 +8,8 @@ export default function AddGalleryImage() {
   const [status, setStatus] = useState("active");
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState(null);
+
+  const navigate = useNavigate(); // Initialize navigate
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -24,7 +27,11 @@ export default function AddGalleryImage() {
 
     try {
       await axios.post("http://localhost:5000/api/gallery", formData);
-      alert("Image uploaded successfully!");
+      
+      // Redirect to the gallery admin page after successful upload
+      navigate("/gallery-admin"); 
+
+      // Optional: reset form if you want
       setTitle("");
       setCategory("");
       setStatus("active");
