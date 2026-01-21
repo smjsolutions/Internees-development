@@ -104,7 +104,13 @@ export default function CreatePackageAdmin() {
                       }}
                       className="accent-green-600"
                     />
-                    <span>{service.name}</span>
+                    <span>
+  {service.name}
+  <span className="text-gray-500 text-xs ml-1">
+    ({service.duration})
+  </span>
+</span>
+
                   </label>
                 ))}
               </div>

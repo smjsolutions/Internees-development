@@ -73,7 +73,7 @@ export default function PackageDetailsAdmin() {
           <div className="flex-1 space-y-3">
             <p><b>Name:</b> {pkg.name}</p>
             <p><b>Total Duration:</b> {pkg.totalDuration}</p>
-            <p><b>Price:</b> Rs. {pkg.price}</p>
+            <p><b>Price:</b> {pkg.price}</p>
 
             {/* CLICKABLE STATUS */}
             <p className="flex items-center gap-2">
@@ -112,7 +112,7 @@ export default function PackageDetailsAdmin() {
                   <tr key={s._id} className="border-t">
                     <td className="p-2 sm:p-3">{s.name}</td>
                     <td className="p-2 sm:p-3">{s.duration || "—"}</td>
-                    <td className="p-2 sm:p-3">{s.price ? `Rs. ${s.price}` : "—"}</td>
+                    <td className="p-2 sm:p-3">{s.pricing ? `Rs. ${s.pricing}` : "—"}</td>
                   </tr>
                 ))}
               </tbody>
