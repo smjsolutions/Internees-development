@@ -27,9 +27,4 @@ router.get("/:id", getPackageById);
 router.put("/:id", uploadPackage.single("image"), updatePackage);
 
 // ACTIVATE / DEACTIVATE
-router.patch("/:id/status", togglePackageStatus);
-
-// SOFT DELETE
-router.delete("/:id", deletePackage);
-
 module.exports = router;

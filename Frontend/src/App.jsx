@@ -63,10 +63,18 @@ export default function App() {
       <Route path="/services" element={<ServicePage />} />
       <Route path="/servicedetail/:id" element={<ServicesDetailPage />} />
       <Route path="/update-service/:id" element={<UpdateService />} />
-      <Route path="/gallery-admin/add" element={<Addgalleryimage />} />
-      <Route path="/gallery-admin" element={<AllGalleryimageAdmin />} />
-      <Route path="/gallery/edit/:id" element={<UpdateGalleryAdmin />} />
-      <Route path="/cutomergallery" element={<CustomerGallerypage />} />
+      
+      
+     
+      
+        <Route path="/gallery-admin/add" element={<Addgalleryimage />} />
+         <Route path="/gallery-admin" element={<AllGalleryimageAdmin/>} />
+         <Route path="/gallery/edit/:id" element={<UpdateGalleryAdmin />} />
+         <Route path="/cutomergallery" element={<CustomerGallerypage/>} />
+         
+      
+
+     
     </Routes>
   );
 }

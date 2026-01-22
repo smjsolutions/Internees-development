@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import PackageCard from "../components/PackageCard";
 
@@ -8,14 +8,16 @@ const Packages = () => {
   const [category, setCategory] = useState("All");
   const [loading, setLoading] = useState(true);
 
-  // FETCH PACKAGES FROM BACKEND (CUSTOMER SIDE)
+  const scrollRef = useRef(null);
+
+  // FETCH PACKAGES
   useEffect(() => {
     const fetchPackages = async () => {
       try {
         const res = await axios.get(
           "http://localhost:5000/api/packages/customer"
         );
-        // ✅ Filter only active packages
+
         const activePackages = res.data.filter((pkg) => pkg.isActive);
         setPackages(activePackages);
       } catch (error) {
@@ -28,7 +30,6 @@ const Packages = () => {
     fetchPackages();
   }, []);
 
-  // SEARCH & CATEGORY FILTER
   const filteredPackages = packages
     .filter((pkg) =>
       pkg.name.toLowerCase().includes(search.toLowerCase())
@@ -37,7 +38,15 @@ const Packages = () => {
       category === "All" ? true : pkg.category === category
     );
 
-  // LOADING STATE
+  // SCROLL HANDLERS
+  const scrollLeft = () => {
+    scrollRef.current.scrollBy({ left: -350, behavior: "smooth" });
+  };
+
+  const scrollRight = () => {
+    scrollRef.current.scrollBy({ left: 350, behavior: "smooth" });
+  };
+
   if (loading) {
     return (
       <div className="py-20 text-center text-gray-500">
@@ -47,44 +56,50 @@ const Packages = () => {
   }
 
   return (
-    <section className="bg-[#faf7f2] py-16">
-      <div className="max-w-7xl mx-auto px-4">
+    <section  id="packages" className="bg-[#faf7f2] py-16">
+      <div className="max-w-7xl mx-auto px-4 relative">
 
         <h2 className="text-4xl font-serif text-center mb-10">
           Our Premium Packages
         </h2>
 
-        {/* SEARCH & FILTER */}
-        <div className="flex flex-col md:flex-row gap-4 mb-10">
-          <input
-            type="text"
-            placeholder="Search packages..."
-            className="p-3 rounded-md border w-full"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+        {/* SCROLL BUTTONS */}
+        <button
+  onClick={scrollLeft}
+  className="absolute left-4 top-1/2 -translate-y-1/2 z-20
+  bg-white shadow-lg p-3 rounded-full hover:bg-gray-100"
+>
+  ❮
+</button>
 
-          <select
-            className="p-3 rounded-md border"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-          >
-            <option value="All">All</option>
-            <option value="Basic">Basic</option>
-            <option value="Premium">Premium</option>
-            <option value="Luxury">Luxury</option>
-          </select>
-        </div>
 
-        {/* PACKAGES GRID */}
+        <button
+  onClick={scrollRight}
+  className="absolute right-4 top-1/2 -translate-y-1/2 z-20
+  bg-white shadow-lg p-3 rounded-full hover:bg-gray-100"
+>
+  ❯
+</button>
+
+
+        {/* HORIZONTAL SCROLL */}
         {filteredPackages.length === 0 ? (
           <p className="text-center text-gray-500">
             No packages available at the moment.
           </p>
         ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div
+            ref={scrollRef}
+            className="flex gap-8 overflow-x-auto scroll-smooth
+            scrollbar-hide px-6"
+          >
             {filteredPackages.map((pkg) => (
-              <PackageCard key={pkg._id} pkg={pkg} />
+              <div
+                key={pkg._id}
+                className="min-w-[380px] max-w-[380px]"
+              >
+                <PackageCard pkg={pkg} />
+              </div>
             ))}
           </div>
         )}
