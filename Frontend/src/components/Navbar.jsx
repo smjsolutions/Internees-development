@@ -12,12 +12,24 @@ const Navbar = () => {
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "auto";
   }, [isOpen]);
+const handlePackagesClick = () => {
+  navigate("/");
+
+  // thora delay taake Home page load ho jaye
+  setTimeout(() => {
+    const section = document.getElementById("packages");
+    if (section) {
+      section.scrollIntoView({ behavior: "smooth" });
+    }
+  }, 100);
+};
 
   // Menu items with paths
   const menuItems = [
     { name: "Home", path: "/" },
     { name: "Who we are", path: "/about" },
-    { name: "Deals/Packages", path: "/deals" },
+    { name: "Deals/Packages", path: "/" },
+
     { name: "Services We Offer", path: "/services" },
     { name: "Gallery", path: "/cutomergallery" }, // navigate here
     { name: "Contact", path: "/contact" },
@@ -42,7 +54,14 @@ const Navbar = () => {
               <li
                 key={item.name}
                 className="hover:text-[#BB8C4B] cursor-pointer transition"
-                onClick={() => navigate(item.path)}
+                onClick={() => {
+  if (item.name === "Deals/Packages") {
+    handlePackagesClick();
+  } else {
+    navigate(item.path);
+  }
+}}
+
               >
                 {item.name}
               </li>
@@ -98,9 +117,14 @@ const Navbar = () => {
             <li
               key={item.name}
               onClick={() => {
-                navigate(item.path); // navigate to route
-                setIsOpen(false);   // close mobile menu
-              }}
+  if (item.name === "Deals/Packages") {
+    handlePackagesClick();
+  } else {
+    navigate(item.path);
+  }
+  setIsOpen(false);
+}}
+
               className="hover:text-[#BB8C4B] transition cursor-pointer"
             >
               {item.name}
