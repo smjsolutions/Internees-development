@@ -56,7 +56,7 @@ const Packages = () => {
   }
 
   return (
-    <section className="bg-[#faf7f2] py-16">
+    <section  id="packages" className="bg-[#faf7f2] py-16">
       <div className="max-w-7xl mx-auto px-4 relative">
 
         <h2 className="text-4xl font-serif text-center mb-10">

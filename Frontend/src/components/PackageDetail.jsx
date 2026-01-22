@@ -40,6 +40,7 @@ const PackageDetail = () => {
     <section className="bg-[#faf7f2] pt-32 pb-16">
       <div className="max-w-6xl mx-auto px-4">
         
+        
         <div className="grid md:grid-cols-2 gap-10 items-start">
 
           {/* IMAGE */}
