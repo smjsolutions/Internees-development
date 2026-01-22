@@ -13,13 +13,14 @@ const Navbar = () => {
     document.body.style.overflow = isOpen ? "hidden" : "auto";
   }, [isOpen]);
 
+  // Menu items with paths
   const menuItems = [
-    "Home",
-    "Who we are",
-    "Deals/Packages",
-    "Services We Offer",
-    "Gallery",
-    "Contact",
+    { name: "Home", path: "/" },
+    { name: "Who we are", path: "/about" },
+    { name: "Deals/Packages", path: "/deals" },
+    { name: "Services We Offer", path: "/services" },
+    { name: "Gallery", path: "/cutomergallery" }, // navigate here
+    { name: "Contact", path: "/contact" },
   ];
 
   return (
@@ -39,10 +40,11 @@ const Navbar = () => {
           <ul className="hidden lg:flex flex-1 justify-center items-center gap-4 xl:gap-6 uppercase text-[14px] lg:text-[15px] font-serif text-[#DDDDDD]">
             {menuItems.map((item) => (
               <li
-                key={item}
+                key={item.name}
                 className="hover:text-[#BB8C4B] cursor-pointer transition"
+                onClick={() => navigate(item.path)}
               >
-                {item}
+                {item.name}
               </li>
             ))}
           </ul>
@@ -60,7 +62,7 @@ const Navbar = () => {
               </div>
             </div>
 
-            {/* HAMBURGER (SHOWS BELOW LG, INCLUDING MD) */}
+            {/* HAMBURGER (SHOWS BELOW LG) */}
             <button
               className="lg:hidden text-[#DDDDDD]"
               onClick={() => setIsOpen(!isOpen)}
@@ -94,11 +96,14 @@ const Navbar = () => {
         <ul className="flex flex-col items-center gap-4 py-6 uppercase text-[14px] font-serif text-[#DDDDDD]">
           {menuItems.map((item) => (
             <li
-              key={item}
-              onClick={() => setIsOpen(false)}
+              key={item.name}
+              onClick={() => {
+                navigate(item.path); // navigate to route
+                setIsOpen(false);   // close mobile menu
+              }}
               className="hover:text-[#BB8C4B] transition cursor-pointer"
             >
-              {item}
+              {item.name}
             </li>
           ))}
         </ul>
