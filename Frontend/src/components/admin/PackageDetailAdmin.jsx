@@ -112,7 +112,7 @@ export default function PackageDetailsAdmin() {
                   <tr key={s._id} className="border-t">
                     <td className="p-2 sm:p-3">{s.name}</td>
                     <td className="p-2 sm:p-3">{s.duration || "—"}</td>
-                    <td className="p-2 sm:p-3">{s.pricing ? `Rs. ${s.pricing}` : "—"}</td>
+                    <td className="p-2 sm:p-3">{s.pricing ? `${s.pricing}` : "—"}</td>
                   </tr>
                 ))}
               </tbody>

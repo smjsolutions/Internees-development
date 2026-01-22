@@ -8,23 +8,26 @@ const {
   updatePackage,
   getAllPackagesAdmin,
   getCustomerPackages,
-  getPackageById, // ✅ ADD THIS
+  getPackageById,
   togglePackageStatus,
   deletePackage,
 } = require("../controllers/packageController");
 
-
 // CREATE
 router.post("/", uploadPackage.single("image"), createPackage);
 
-// READ (ADMIN)
+// READ
 router.get("/", getAllPackagesAdmin);
 router.get("/customer", getCustomerPackages);
 router.get("/:id", getPackageById);
 
-
 // UPDATE
 router.put("/:id", uploadPackage.single("image"), updatePackage);
 
-// ACTIVATE / DEACTIVATE
+// ✅ ACTIVATE / DEACTIVATE
+router.patch("/:id/status", togglePackageStatus);
+
+// ✅ SOFT DELETE
+router.delete("/:id", deletePackage);
+
 module.exports = router;
