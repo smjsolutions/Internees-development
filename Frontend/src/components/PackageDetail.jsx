@@ -72,7 +72,7 @@ const PackageDetail = () => {
   >
     <span>{service.name}</span>
     <span className="text-gray-500">
-      {service.duration} • Rs. {service.price}
+       
     </span>
   </li>
 ))}
