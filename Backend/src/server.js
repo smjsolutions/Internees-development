@@ -13,6 +13,9 @@ const authRoutes = require("./routes/authRoutes"); // path to your auth routes f
 const galleryRoutes = require("./routes/adminGalleryRoutes");
 const CustomerGalleryRoutes=require("./routes/customerGalleryRoutes")
 const packageRoutes = require("./routes/packageRoutes");
+const adminUsersRoutes = require("./routes/adminUsers.routes");
+const adminAuthRoutes = require("./routes/adminAuth.routes");
+
 
 const app = express();
 
@@ -57,7 +60,8 @@ app.get("/api/health", (req, res) => {
    ========================= */
 app.use("/api/services", serviceRoutes);       // Services (Admin)
 app.use("/api/packages", packageRoutes);       // ✅ Packages (Admin)
-
+app.use("/api/admin/auth", adminAuthRoutes);   // Admin login
+app.use("/api/admin", adminUsersRoutes);       // Admin users CRUD
 /* =========================
    🔹 CUSTOMER ROUTES
    ========================= */

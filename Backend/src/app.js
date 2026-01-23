@@ -5,6 +5,7 @@ const cors = require("cors");
 const serviceRoutes = require("./routes/service.routes"); // Admin routes
 const customerServicesRoutes = require("./routes/customerservices"); // Customer routes
 
+
 const app = express();
 
 app.use(cors());
@@ -23,6 +24,7 @@ app.use("/api/services", serviceRoutes);
    Customer API routes
    ====================== */
 app.use("/api/customer/services", customerServicesRoutes);
+
 
 
 // Test root endpoint
