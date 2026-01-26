@@ -1,6 +1,9 @@
 const bcrypt = require("bcryptjs");
 const AdminUser = require("../models/adminUser.model");
 
+/* =========================
+   CREATE ADMIN USER
+========================= */
 const adminCreateUser = async (req, res) => {
   try {
     const { name, username, email, password, role } = req.body;
@@ -9,6 +12,13 @@ const adminCreateUser = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: "All fields are required",
+      });
+    }
+
+    if (name === "Super Admin") {
+      return res.status(403).json({
+        success: false,
+        message: "Super admin already exists",
       });
     }
 
@@ -41,58 +51,103 @@ const adminCreateUser = async (req, res) => {
     res.status(201).json({
       success: true,
       message: "Admin user created successfully",
-      admin: {
-        id: admin._id,
-        name: admin.name,
-        username: admin.username,
-        email: admin.email,
-        role: admin.role,
-      },
+      admin,
     });
   } catch (error) {
-    console.error("Create Admin Error:", error.message);
-    res.status(500).json({
-      success: false,
-      message: "Server error",
-    });
+    res.status(500).json({ success: false, message: "Server error" });
   }
 };
-// List all admin users
+
+/* =========================
+   GET USERS WITH FILTERS
+   ❌ SUPER ADMIN EXCLUDED
+========================= */
 const adminListUsers = async (req, res) => {
   try {
-    const users = await AdminUser.find().select("-password_hash"); // password hide kar rahe hain
+    const { search, role } = req.query;
+
+    const filter = {
+      name: { $ne: "Super Admin" }, // 🔥 HARD BLOCK
+    };
+
+    // 🔍 Search filter
+    if (search) {
+      filter.$or = [
+        { name: { $regex: search, $options: "i" } },
+        { username: { $regex: search, $options: "i" } },
+        { email: { $regex: search, $options: "i" } },
+      ];
+    }
+
+    // 🎭 Role filter
+    if (role) {
+      filter.role = role;
+    }
+
+    const users = await AdminUser.find(filter).select("-password_hash");
+
     res.status(200).json({
       success: true,
+      count: users.length,
       users,
     });
   } catch (error) {
-    console.error("List Admin Users Error:", error.message);
-    res.status(500).json({
-      success: false,
-      message: "Server error",
-    });
+    res.status(500).json({ success: false, message: "Server error" });
   }
 };
 
-// Update admin user
-const adminUpdateUser = async (req, res) => {
+/* =========================
+   GET SINGLE USER
+   ❌ SUPER ADMIN BLOCKED
+========================= */
+const adminGetUser = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, username, email, role } = req.body;
 
-    const user = await AdminUser.findById(id);
+    const user = await AdminUser.findOne({
+      _id: id,
+      name: { $ne: "Super Admin" },
+    }).select("-password_hash");
+
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: "User not found",
+        message: "User not found or protected",
       });
     }
 
-    user.name = name || user.name;
-    user.username = username || user.username;
-    user.email = email || user.email;
-    user.role = role || user.role;
+    res.status(200).json({
+      success: true,
+      user,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
 
+
+/* =========================
+   UPDATE USER
+   ❌ SUPER ADMIN BLOCKED
+========================= */
+const adminUpdateUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const user = await AdminUser.findOne({
+      _id: id,
+      name: { $ne: "Super Admin" },
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found or protected",
+      });
+    }
+
+    Object.assign(user, req.body);
     await user.save();
 
     res.status(200).json({
@@ -101,22 +156,27 @@ const adminUpdateUser = async (req, res) => {
       user,
     });
   } catch (error) {
-    console.error("Update Admin User Error:", error.message);
-    res.status(500).json({
-      success: false,
-      message: "Server error",
-    });
+    res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
+/* =========================
+   DELETE USER
+   ❌ SUPER ADMIN BLOCKED
+========================= */
 const adminDeleteUser = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const user = await AdminUser.findById(id);
+    const user = await AdminUser.findOne({
+      _id: id,
+      name: { $ne: "Super Admin" },
+    });
+
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: "Admin user not found",
+        message: "Admin user not found or protected",
       });
     }
 
@@ -127,11 +187,7 @@ const adminDeleteUser = async (req, res) => {
       message: "Admin user deleted successfully",
     });
   } catch (error) {
-    console.error("Delete Admin Error:", error.message);
-    res.status(500).json({
-      success: false,
-      message: "Server error",
-    });
+    res.status(500).json({ success: false, message: "Server error" });
   }
 };
 
@@ -140,5 +196,5 @@ module.exports = {
   adminListUsers,
   adminUpdateUser,
   adminDeleteUser,
-  
+  adminGetUser,
 };

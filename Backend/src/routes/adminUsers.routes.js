@@ -1,23 +1,21 @@
 const express = require("express");
-const { adminRequireAuth } = require("../middleware/adminAuth.middleware.js");
-const { adminOnly } = require("../middleware/adminOnly.middleware.js");
+const { adminRequireAuth, adminOnly } = require("../middleware/adminAuth.middleware");
 
 const {
   adminCreateUser,
   adminListUsers,
   adminUpdateUser,
-} = require("../controllers/adminUsers.controller.js");
+  adminDeleteUser,
+  adminGetUser,
+} = require("../controllers/adminUsers.controller");
 
 const router = express.Router();
-console.log({
-  adminRequireAuth,
-  adminOnly,
-  adminCreateUser,
-});
-
 
 router.post("/users", adminRequireAuth, adminOnly, adminCreateUser);
 router.get("/users", adminRequireAuth, adminOnly, adminListUsers);
 router.patch("/users/:id", adminRequireAuth, adminOnly, adminUpdateUser);
+router.delete("/users/:id", adminRequireAuth, adminOnly, adminDeleteUser);
+router.get("/users/:id", adminRequireAuth, adminOnly, adminGetUser);
+
 
 module.exports = router;

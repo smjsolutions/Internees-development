@@ -31,6 +31,8 @@ import UpdateGalleryAdmin from "./pages/admin/UpdateGalleryAdmin";
 import PackageDetailPage from "./pages/PackageDetailPage";
 
 import CustomerGallerypage from "./pages/CustomerGallerypage";
+import CreateUser from "./pages/admin/CreateUser";
+import UpdateUser from "./pages/admin/UpdateUser";
 
 export default function App() {
   return (
@@ -72,6 +74,9 @@ export default function App() {
          <Route path="/gallery/edit/:id" element={<UpdateGalleryAdmin />} />
          <Route path="/cutomergallery" element={<CustomerGallerypage/>} />
          
+         <Route path="/create-user" element={<CreateUser />} />
+         <Route path="/edit-user/:id" element={<UpdateUser />} />
+
       
 
      

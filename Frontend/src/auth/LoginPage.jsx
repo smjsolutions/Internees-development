@@ -69,23 +69,41 @@ const LoginPage = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!validateForm()) return;
+  if (!validateForm()) return;
 
-    setLoading(true);
-    setErrors({});
+  setLoading(true);
+  setErrors({});
+  setSuccessMessage("");
 
-    try {
-      const response = await fetch(
-        `${
-          import.meta.env.VITE_API_URL || "http://localhost:5000/api"
-        }/auth/login`,
+  try {
+    // First, try user login
+    let endpoint = `${import.meta.env.VITE_API_URL || "http://localhost:5000/api"}/auth/login`;
+
+    // If admin email/username, use admin login endpoint
+    // Optional: You can detect admin based on a separate checkbox or username/email
+    // For simplicity, we try both
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: formData.email,
+        password: formData.password,
+      }),
+    });
+
+    let data = await response.json();
+
+    if (!response.ok) {
+      // If user login fails, try admin login
+      const adminResponse = await fetch(
+        `${import.meta.env.VITE_API_URL || "http://localhost:5000/api"}/admin/auth/login`,
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             email: formData.email,
             password: formData.password,
@@ -93,30 +111,34 @@ const LoginPage = () => {
         }
       );
 
-      const data = await response.json();
+      data = await adminResponse.json();
 
-      if (!response.ok) {
+      if (!adminResponse.ok) {
         throw new Error(data.message || "Login failed");
       }
-
-      // Store tokens
-      localStorage.setItem("accessToken", data.accessToken);
-      localStorage.setItem("refreshToken", data.refreshToken);
-
-      // Store user data
-      localStorage.setItem("user", JSON.stringify(data.user));
-
-      // Show success and redirect
-      setSuccessMessage("Login successful! Redirecting...");
-      setTimeout(() => {
-        window.location.href = "/";
-      }, 1000);
-    } catch (error) {
-      setErrors({ form: error.message });
-    } finally {
-      setLoading(false);
     }
-  };
+
+    // Save token & user
+    localStorage.setItem("accessToken", data.token);
+    localStorage.setItem("user", JSON.stringify(data.user));
+
+    setSuccessMessage("Login successful! Redirecting...");
+
+    // Redirect based on role
+    setTimeout(() => {
+      if (data.user.role === "ADMIN") {
+        window.location.href = "/dashboard";
+      } else {
+        window.location.href = "/";
+      }
+    }, 1000);
+  } catch (error) {
+    setErrors({ form: error.message });
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const handleSocialLogin = (provider) => {
     const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
