@@ -2,7 +2,22 @@ const mongoose = require("mongoose");
 
 const adminUserSchema = new mongoose.Schema(
   {
-    name: { type: String, required: true, trim: true, maxlength: 120 },
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+      maxlength: 120,
+    },
+
+    username: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+      minlength: 3,
+      maxlength: 50,
+    },
 
     email: {
       type: String,
@@ -13,13 +28,16 @@ const adminUserSchema = new mongoose.Schema(
       maxlength: 200,
     },
 
-    password_hash: { type: String, required: true, select: false },
+    password_hash: {
+      type: String,
+      required: true,
+      select: false,
+    },
 
     role: {
       type: String,
-      required: true,
-      enum: ["ADMIN", "MANAGER", "Staff", "customer","Receptionist"],
-      default: "customer",
+      enum: ["ADMIN", "MANAGER", "SUPPORT", "USER"],
+      default: "USER",
     },
 
     status: {
@@ -37,8 +55,9 @@ const adminUserSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-adminUserSchema.index({ email: 1 }, { unique: true });
+/* ❌ REMOVE DUPLICATE INDEX WARNING
+   Do NOT add schema.index({ email: 1 })
+   because unique:true already creates index
+*/
 
-const AdminUser = mongoose.model("AdminUser", adminUserSchema);
-
-module.exports = AdminUser;
+module.exports = mongoose.model("AdminUser", adminUserSchema);

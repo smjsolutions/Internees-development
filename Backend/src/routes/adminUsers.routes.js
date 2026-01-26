@@ -9,6 +9,12 @@ const {
 } = require("../controllers/adminUsers.controller.js");
 
 const router = express.Router();
+console.log({
+  adminRequireAuth,
+  adminOnly,
+  adminCreateUser,
+});
+
 
 router.post("/users", adminRequireAuth, adminOnly, adminCreateUser);
 router.get("/users", adminRequireAuth, adminOnly, adminListUsers);

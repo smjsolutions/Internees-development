@@ -1,48 +1,74 @@
+const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
-const AdminUser = require("../models/adminUser.model.js");
+const AdminUser = require("../models/adminUser.model");
 
-const adminLogin = async (req, res) => {
+exports.adminLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ message: "Email and password required" });
+      return res.status(400).json({
+        success: false,
+        message: "Email/Username and password are required",
+      });
     }
 
-    const user = await AdminUser.findOne({ email: email.toLowerCase().trim() })
-      .select("+password_hash _id name email role status"); // ✅ include password_hash for login
+    const identifier = email.toLowerCase().trim();
 
-    if (!user) return res.status(401).json({ message: "Invalid credentials" });
+    const user = await AdminUser.findOne({
+      $or: [{ email: identifier }, { username: identifier }],
+    }).select("+password_hash _id name email username role status");
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid credentials",
+      });
+    }
 
     if (user.status !== "ACTIVE") {
-      return res.status(403).json({ message: "Account inactive" });
+      return res.status(403).json({
+        success: false,
+        message: "Account is inactive",
+      });
     }
 
-    const ok = await bcrypt.compare(password, user.password_hash);
-    if (!ok) return res.status(401).json({ message: "Invalid credentials" });
+    const isMatch = await bcrypt.compare(password, user.password_hash);
+    if (!isMatch) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid credentials",
+      });
+    }
 
-    // 🔹 Use JWT_ACCESS_SECRET from .env
-    const token = jwt.sign(
-      { user_id: user._id.toString(), role: user.role },
-      process.env.JWT_ACCESS_SECRET,               // ✔ Correct secret
-      { expiresIn: process.env.JWT_ACCESS_EXPIRY || "7d" } // ✔ use expiry from .env
-    );
+   if (!process.env.JWT_ACCESS_SECRET) {
+  throw new Error("JWT_ACCESS_SECRET not defined in environment variables");
+}
 
-    return res.json({
+const token = jwt.sign(
+  { id: user._id, role: user.role },
+  process.env.JWT_ACCESS_SECRET,
+  { expiresIn: process.env.JWT_REFRESH_EXPIRY|| "7d" }
+);
+
+
+    res.status(200).json({
+      success: true,
+      message: "Login successful",
       token,
       user: {
         id: user._id,
         name: user.name,
+        username: user.username,
         email: user.email,
         role: user.role,
-        status: user.status,
       },
     });
-  } catch (err) {
-    console.error("Login error:", err); // 🔹 log full error for debugging
-    return res.status(500).json({ message: "Server error", error: err.message });
+  } catch (error) {
+    console.error("Admin Login Error:", error.message);
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
   }
 };
-
-module.exports = { adminLogin };

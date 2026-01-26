@@ -1,192 +1,137 @@
-const bcrypt = require("bcrypt");
-const AdminUser = require("../models/adminUser.model.js");
-const { adminValidatePasswordRules } = require("../utils/adminPasswordRules.js");
-const { adminWriteAuditLog } = require("../utils/adminAuditLogger.js");
+const bcrypt = require("bcryptjs");
+const AdminUser = require("../models/adminUser.model");
 
-const ADMIN_ALLOWED_ROLES = ["ADMIN", "MANAGER", "SUPPORT", "USER"];
-const ADMIN_ALLOWED_STATUS = ["ACTIVE", "INACTIVE"];
-
-/**
- * POST /admin/users
- */
 const adminCreateUser = async (req, res) => {
   try {
-    const adminId = req.user.id;
+    const { name, username, email, password, role } = req.body;
 
-    const { name, email, role, password } = req.body;
-
-    if (!name || !email || !role || !password) {
+    if (!name || !username || !email || !password) {
       return res.status(400).json({
-        message: "Missing required fields: name, email, role, password",
+        success: false,
+        message: "All fields are required",
       });
     }
 
-    const normalizedEmail = String(email).toLowerCase().trim();
-
-    if (!ADMIN_ALLOWED_ROLES.includes(role)) {
-      return res.status(400).json({ message: "Invalid role value" });
+    const emailExists = await AdminUser.findOne({ email });
+    if (emailExists) {
+      return res.status(409).json({
+        success: false,
+        message: "Email already exists",
+      });
     }
 
-    const pwErr = adminValidatePasswordRules(password);
-    if (pwErr) return res.status(400).json({ message: pwErr });
-
-    const existing = await AdminUser.findOne({ email: normalizedEmail });
-    if (existing) return res.status(409).json({ message: "Email already exists" });
+    const usernameExists = await AdminUser.findOne({ username });
+    if (usernameExists) {
+      return res.status(409).json({
+        success: false,
+        message: "Username already exists",
+      });
+    }
 
     const password_hash = await bcrypt.hash(password, 12);
 
-    const newUser = await AdminUser.create({
-      name: String(name).trim(),
-      email: normalizedEmail,
-      role,
+    const admin = await AdminUser.create({
+      name,
+      username,
+      email,
       password_hash,
-      status: "ACTIVE",
-      created_by_admin_id: adminId,
+      role: role || "USER",
     });
 
-    await adminWriteAuditLog({
-      action: "ADMIN_CREATED_USER",
-      actor_admin_id: adminId,
-      target_user_id: newUser._id,
-      metadata: {
-        name: newUser.name,
-        email: newUser.email,
-        role: newUser.role,
-        status: newUser.status,
+    res.status(201).json({
+      success: true,
+      message: "Admin user created successfully",
+      admin: {
+        id: admin._id,
+        name: admin.name,
+        username: admin.username,
+        email: admin.email,
+        role: admin.role,
       },
-      req,
     });
-
-    return res.status(201).json({
-      id: newUser._id,
-      name: newUser.name,
-      email: newUser.email,
-      role: newUser.role,
-      status: newUser.status,
-      created_at: newUser.createdAt,
+  } catch (error) {
+    console.error("Create Admin Error:", error.message);
+    res.status(500).json({
+      success: false,
+      message: "Server error",
     });
-  } catch (err) {
-    if (err?.code === 11000) {
-      return res.status(409).json({ message: "Email already exists" });
-    }
-    return res.status(500).json({ message: "Server error" });
   }
 };
-
-/**
- * GET /admin/users
- */
+// List all admin users
 const adminListUsers = async (req, res) => {
   try {
-    const page = Math.max(parseInt(req.query.page || "1", 10), 1);
-    const limit = Math.min(Math.max(parseInt(req.query.limit || "20", 10), 1), 100);
-
-    const search = (req.query.search || "").trim();
-    const sort = req.query.sort === "oldest" ? "oldest" : "newest";
-
-    const filter = {};
-
-    if (search) {
-      filter.$or = [
-        { name: { $regex: search, $options: "i" } },
-        { email: { $regex: search, $options: "i" } },
-      ];
-    }
-
-    const sortObj = { createdAt: sort === "oldest" ? 1 : -1 };
-
-    const total = await AdminUser.countDocuments(filter);
-
-    const users = await AdminUser.find(filter)
-      .select("_id name email role status createdAt updatedAt") // ✅ no password_hash
-      .sort(sortObj)
-      .skip((page - 1) * limit)
-      .limit(limit);
-
-    return res.json({
-      page,
-      limit,
-      total,
-      results: users.map((u) => ({
-        id: u._id,
-        name: u.name,
-        email: u.email,
-        role: u.role,
-        status: u.status,
-        created_at: u.createdAt,
-        updated_at: u.updatedAt,
-      })),
+    const users = await AdminUser.find().select("-password_hash"); // password hide kar rahe hain
+    res.status(200).json({
+      success: true,
+      users,
     });
-  } catch (err) {
-    return res.status(500).json({ message: "Server error" });
+  } catch (error) {
+    console.error("List Admin Users Error:", error.message);
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
   }
 };
 
-/**
- * PATCH /admin/users/:id
- */
+// Update admin user
 const adminUpdateUser = async (req, res) => {
   try {
-    const adminId = req.user.id;
-    const userId = req.params.id;
+    const { id } = req.params;
+    const { name, username, email, role } = req.body;
 
-    const allowedFields = ["name", "role", "status"];
-    const restrictedFields = ["email", "password", "password_hash", "created_by_admin_id"];
-
-    const keys = Object.keys(req.body || {});
-
-    for (const k of keys) {
-      if (restrictedFields.includes(k)) {
-        return res.status(400).json({ message: `Field "${k}" is not editable` });
-      }
-      if (!allowedFields.includes(k)) {
-        return res.status(400).json({ message: `Field "${k}" is not allowed` });
-      }
+    const user = await AdminUser.findById(id);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
     }
 
-    const before = await AdminUser.findById(userId).select("_id name role status email");
-    if (!before) return res.status(404).json({ message: "User not found" });
+    user.name = name || user.name;
+    user.username = username || user.username;
+    user.email = email || user.email;
+    user.role = role || user.role;
 
-    if (req.body.role && !ADMIN_ALLOWED_ROLES.includes(req.body.role)) {
-      return res.status(400).json({ message: "Invalid role value" });
-    }
+    await user.save();
 
-    if (req.body.status && !ADMIN_ALLOWED_STATUS.includes(req.body.status)) {
-      return res.status(400).json({ message: "Invalid status value" });
-    }
-
-    const updates = {
-      ...(typeof req.body.name === "string" && { name: req.body.name.trim() }),
-      ...(req.body.role && { role: req.body.role }),
-      ...(req.body.status && { status: req.body.status }),
-    };
-
-    const after = await AdminUser.findByIdAndUpdate(userId, updates, {
-      new: true,
-      runValidators: true,
-    }).select("_id name email role status createdAt updatedAt");
-
-    await adminWriteAuditLog({
-      action: "ADMIN_UPDATED_USER",
-      actor_admin_id: adminId,
-      target_user_id: after._id,
-      metadata: {
-        before: { name: before.name, role: before.role, status: before.status },
-        after: { name: after.name, role: after.role, status: after.status },
-      },
-      req,
+    res.status(200).json({
+      success: true,
+      message: "User updated successfully",
+      user,
     });
-
-    return res.json({
-      id: after._id,
-      name: after.name,
-      email: after.email,
-      role: after.role,
-      status: after.status,
-      updated_at: after.updatedAt,
+  } catch (error) {
+    console.error("Update Admin User Error:", error.message);
+    res.status(500).json({
+      success: false,
+      message: "Server error",
     });
-  } catch (err) {
-    return res.status(500).json({ message: "Server error" });
+  }
+};
+const adminDeleteUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const user = await AdminUser.findById(id);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "Admin user not found",
+      });
+    }
+
+    await AdminUser.findByIdAndDelete(id);
+
+    res.status(200).json({
+      success: true,
+      message: "Admin user deleted successfully",
+    });
+  } catch (error) {
+    console.error("Delete Admin Error:", error.message);
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
   }
 };
 
@@ -194,4 +139,6 @@ module.exports = {
   adminCreateUser,
   adminListUsers,
   adminUpdateUser,
+  adminDeleteUser,
+  
 };
