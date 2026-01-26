@@ -22,10 +22,11 @@ const adminLogin = async (req, res) => {
     const ok = await bcrypt.compare(password, user.password_hash);
     if (!ok) return res.status(401).json({ message: "Invalid credentials" });
 
+    // 🔹 Use JWT_ACCESS_SECRET from .env
     const token = jwt.sign(
       { user_id: user._id.toString(), role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
+      process.env.JWT_ACCESS_SECRET,               // ✔ Correct secret
+      { expiresIn: process.env.JWT_ACCESS_EXPIRY || "7d" } // ✔ use expiry from .env
     );
 
     return res.json({
@@ -39,7 +40,8 @@ const adminLogin = async (req, res) => {
       },
     });
   } catch (err) {
-    return res.status(500).json({ message: "Server error" });
+    console.error("Login error:", err); // 🔹 log full error for debugging
+    return res.status(500).json({ message: "Server error", error: err.message });
   }
 };
 
