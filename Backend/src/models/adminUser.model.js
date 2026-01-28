@@ -26,12 +26,16 @@ const adminUserSchema = new mongoose.Schema(
       lowercase: true,
       trim: true,
       maxlength: 200,
+      match: [/^\S+@\S+\.\S+$/, "Please provide a valid email"],
     },
 
     password_hash: {
       type: String,
       required: true,
-      select: false,
+      
+      minlength: [8, "Password must be at least 8 characters"],
+       select: false,
+    
     },
 
     role: {

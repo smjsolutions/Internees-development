@@ -40,7 +40,7 @@ exports.register = async (req, res, next) => {
       password,
       name,
       phone,
-      role: "customer",
+      role: "CUSTOMER",
       isVerified: false, // ✅ Not verified by default
     });
 

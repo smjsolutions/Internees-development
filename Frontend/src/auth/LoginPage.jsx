@@ -68,9 +68,8 @@ const LoginPage = () => {
     }
   };
 
-  const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
   e.preventDefault();
-
   if (!validateForm()) return;
 
   setLoading(true);
@@ -78,66 +77,69 @@ const LoginPage = () => {
   setSuccessMessage("");
 
   try {
-    // First, try user login
-    let endpoint = `${import.meta.env.VITE_API_URL || "http://localhost:5000/api"}/auth/login`;
+    const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
-    // If admin email/username, use admin login endpoint
-    // Optional: You can detect admin based on a separate checkbox or username/email
-    // For simplicity, we try both
-    const response = await fetch(endpoint, {
+    // 1️⃣ Try user login first
+    const response = await fetch(`${apiUrl}/auth/login`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: formData.email,
-        password: formData.password,
-      }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: formData.email, password: formData.password }),
     });
 
-    let data = await response.json();
+    const data = await response.json();
 
     if (!response.ok) {
-      // If user login fails, try admin login
-      const adminResponse = await fetch(
-        `${import.meta.env.VITE_API_URL || "http://localhost:5000/api"}/admin/auth/login`,
-        {
+      // If the backend gives a specific message like "User inactive" or "Wrong password"
+      const userMessage = data?.message || "Login failed";
+
+      // Only try admin login if the error is "user not found" or "wrong credentials"
+      if (userMessage.toLowerCase().includes("not found") || userMessage.toLowerCase().includes("invalid")) {
+        // Try admin login
+        const adminResponse = await fetch(`${apiUrl}/admin/auth/login`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email: formData.email,
-            password: formData.password,
-          }),
+          body: JSON.stringify({ email: formData.email, password: formData.password }),
+        });
+
+        const adminData = await adminResponse.json();
+
+        if (!adminResponse.ok) {
+          // Show backend message for admin login
+          setErrors({ form: adminData?.message || "Login failed" });
+          setLoading(false);
+          return;
         }
-      );
 
-      data = await adminResponse.json();
-
-      if (!adminResponse.ok) {
-        throw new Error(data.message || "Login failed");
+        // Admin login success
+        localStorage.setItem("accessToken", adminData.token);
+        localStorage.setItem("user", JSON.stringify(adminData.user));
+        setSuccessMessage("Login successful! Redirecting...");
+        setTimeout(() => {
+          window.location.href = "/dashboard";
+        }, 1000);
+        return;
       }
+
+      // User login failed with a meaningful message (inactive, invalid password, etc.)
+      setErrors({ form: userMessage });
+      setLoading(false);
+      return;
     }
 
-    // Save token & user
+    // User login success
     localStorage.setItem("accessToken", data.token);
     localStorage.setItem("user", JSON.stringify(data.user));
-
     setSuccessMessage("Login successful! Redirecting...");
-
-    // Redirect based on role
     setTimeout(() => {
-      if (data.user.role === "ADMIN") {
-        window.location.href = "/dashboard";
-      } else {
-        window.location.href = "/";
-      }
+      window.location.href = "/";
     }, 1000);
+
   } catch (error) {
     setErrors({ form: error.message });
-  } finally {
     setLoading(false);
   }
 };
+
 
 
   const handleSocialLogin = (provider) => {
