@@ -15,6 +15,7 @@ export default function EditUser() {
   const [error, setError] = useState("");
 
   const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("USER");
   const [status, setStatus] = useState("ACTIVE");
@@ -29,6 +30,7 @@ export default function EditUser() {
         });
 
         setName(data.user.name);
+        setUsername(data.user.username);
         setEmail(data.user.email);
         setRole(data.user.role);
         setStatus(data.user.status);
@@ -57,7 +59,7 @@ export default function EditUser() {
       const token = localStorage.getItem("accessToken");
       await axios.patch(
         `${API_BASE_URL}/api/admin/users/${id}`,
-        { name, role, status },
+        { name, username, role, status },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -110,6 +112,18 @@ export default function EditUser() {
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
+                  className="w-full border border-gray-300 p-2 sm:p-3 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block mb-1 font-medium text-gray-700">
+                  Username
+                </label>
+                <input
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                   className="w-full border border-gray-300 p-2 sm:p-3 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
                   required
                 />
