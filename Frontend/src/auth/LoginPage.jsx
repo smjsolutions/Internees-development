@@ -22,7 +22,7 @@ const LoginPage = () => {
     if (accessToken && refreshToken) {
       localStorage.setItem("accessToken", accessToken);
       localStorage.setItem("refreshToken", refreshToken);
-      localStorage.setItem("token", accessToken); // For compatibility
+      localStorage.setItem("token", accessToken); // ← Fixed!
       setSuccessMessage("Login successful! Redirecting...");
       setTimeout(() => {
         window.location.href = "/";
@@ -33,7 +33,6 @@ const LoginPage = () => {
       setErrors({ form: "Social authentication failed. Please try again." });
     }
   }, []);
-
   const validateForm = () => {
     const newErrors = {};
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

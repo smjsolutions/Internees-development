@@ -364,7 +364,11 @@ exports.getMyAppointments = async (req, res, next) => {
   try {
     const { status, page = 1, limit = 10 } = req.query;
 
-    const query = { customer: req.user._id };
+    // Find appointments by customer ID OR email (for bookings made before login)
+    const query = {
+      $or: [{ customer: req.user._id }, { customerEmail: req.user.email }],
+    };
+
     if (status) query.status = status;
 
     const appointments = await Appointment.find(query)
@@ -374,7 +378,7 @@ exports.getMyAppointments = async (req, res, next) => {
       .limit(limit * 1)
       .skip((page - 1) * limit);
 
-    const count = await Appointment.countDocuments(query);
+    const count = await Appointment.countDocuments(query); // ← ADD THIS LINE
 
     res.json({
       success: true,

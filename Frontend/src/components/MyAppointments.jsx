@@ -15,7 +15,8 @@ const MyAppointments = () => {
   const fetchAppointments = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem("token");
+      const token =
+        localStorage.getItem("token") || localStorage.getItem("accessToken");
       const params = filter !== "all" ? { status: filter } : {};
 
       const response = await axios.get(
@@ -52,7 +53,8 @@ const MyAppointments = () => {
     }
 
     try {
-      const token = localStorage.getItem("token");
+      const token =
+        localStorage.getItem("token") || localStorage.getItem("accessToken");
       const response = await axios.put(
         `${import.meta.env.VITE_API_BASE_URL}/api/appointments/${appointmentId}/cancel`,
         { cancellationReason: "Cancelled by customer" },
