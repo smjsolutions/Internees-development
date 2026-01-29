@@ -263,8 +263,8 @@ const About = () => {
         </div>
       </div>
 
-      {/* CTA Section */}
-      <div className="bg-gradient-to-r from-[#BB8C4B] to-[#D79A4A] text-white py-16">
+{/* CTA Section */}
+      <div className="bg-gradient-to-r from-[#BB8C4B] to-[#D79A4A] text-white py-16 mb-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-serif font-bold mb-6">
             Ready to Experience the Difference?

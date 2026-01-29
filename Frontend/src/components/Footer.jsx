@@ -37,8 +37,7 @@ const Footer = () => {
             <img src={logo} alt="Salone Logo" className="h-10 w-auto" />
           </div>
           <p className="text-sm mb-4 text-[#DDDDDD]">
-            Aliquyam sed elitr elitr erat sed diam ipsum eirmod eos lorem nonumy. 
-            Tempor sea ipsum diam sed clita dolore eos dolores magna erat dolore sed stet justo et dolor.
+           Our Diamond Trim Beauty Studio is the created for men who appreciate premium quality, time and flawless look.
           </p>
           <div className="flex items-center gap-3 mt-2">
             {socialLinks.map(({ Icon, url, label }, idx) => (
@@ -60,9 +59,9 @@ const Footer = () => {
         {/* Center Section: Contact Info */}
         <div>
           <h3 className="text-[#BB8C4B] text-lg font-semibold mb-4">Contact Us</h3>
-          <p className="text-sm mb-2 text-[#DDDDDD]"><strong>Address:</strong> 123 Street, New York, USA</p>
-          <p className="text-sm mb-2 text-[#DDDDDD]"><strong>Phone:</strong> +012 345 67890</p>
-          <p className="text-sm mb-2 text-[#DDDDDD]"><strong>Email:</strong> info@salone.com</p>
+          <p className="text-sm mb-2 text-[#DDDDDD]"><strong>Address:</strong> Club Road , Near Dessert Palm Hotel, Rahim Yar khan</p>
+          <p className="text-sm mb-2 text-[#DDDDDD]"><strong>Phone:</strong> +923406465222</p>
+          <p className="text-sm mb-2 text-[#DDDDDD]"><strong>Email:</strong> info@diamondtrimpk.com</p>
         </div>
 
         {/* Right Section: Opening Hours */}

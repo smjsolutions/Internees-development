@@ -306,8 +306,8 @@ const Contact = () => {
         </div>
       </div>
 
-      {/* CTA Section - Updated colors */}
-      <div className="bg-gradient-to-r from-[#222227] to-[#BB8C4B] text-white py-16">
+   {/* CTA Section - Updated colors */}
+      <div className="bg-gradient-to-r from-[#222227] to-[#BB8C4B] text-white py-16 mb-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-serif font-bold mb-6">
             Ready for Your Best Look?
